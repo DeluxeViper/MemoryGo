@@ -1,3 +1,6 @@
+# MemoryGo
+A Mobile Application, Created by Abdullah Mohamed &amp; Hudson Pu
+
 # first_app
 
 A new Flutter project.
