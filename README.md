@@ -1,5 +1,5 @@
 # MemoryGo
-A Mobile Application, Created by Abdullah Mohamed &amp; Hudson Pu
+A Mobile Application, Created by Abdullah Mohamed &amp; Hudson Pu.
 
 # first_app
 
