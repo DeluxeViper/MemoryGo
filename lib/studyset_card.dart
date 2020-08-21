@@ -1,5 +1,6 @@
 import 'package:first_app/main.dart';
 import 'package:first_app/pages/settings_page.dart';
+import 'package:first_app/pages/studyset_list.dart';
 import 'package:flutter/material.dart';
 import 'note.dart';
 import 'pages/notes_page.dart';
@@ -10,45 +11,19 @@ import 'pages/notes_page.dart';
 
 // Search up how to assign a dynamic variable to a
 // stateful widget
-class StudySet extends StatefulWidget {
-  final nameOfSet, dateCreated, numOfCards;
-  final MyHomePageState myHomePageState;
+class StudySetCard extends StatefulWidget {
+  final nameOfSet, dateCreated;
 
-  StudySet(
-      {this.myHomePageState,
-      this.nameOfSet,
-      this.dateCreated,
-      this.numOfCards});
-
-  void deleteStudySet() {
-    myHomePageState.deleteStudySet(this);
-  }
+  StudySetCard({this.nameOfSet, this.dateCreated});
 
   @override
-  State<StatefulWidget> createState() {
-    return StudySetState(
-        nameOfSet: this.nameOfSet,
-        dateCreated: this.dateCreated,
-        numOfCards: this.numOfCards);
-  }
-
-  @override
-  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return "nameOfSet: $nameOfSet\ndateCreated: $dateCreated\nnumOfCards: $numOfCards\n";
-  }
+  State<StatefulWidget> createState() => StudySetCardState();
 }
 
-class StudySetState extends State<StudySet> {
+class StudySetCardState extends State<StudySetCard> {
   var nameOfSet, dateCreated, numOfCards;
 
   List<Note> notes = [];
-
-  StudySetState({this.nameOfSet, this.dateCreated, this.numOfCards});
-
-  @override
-  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return "nameOfSet: $nameOfSet\ndateCreated: $dateCreated\nnumOfCards: $numOfCards\nnotes: $notes";
-  }
 
   bool removeNote(Note note) {
     if (notes.contains(note)) {
@@ -127,7 +102,7 @@ class StudySetState extends State<StudySet> {
                             new SizedBox(height: 10.0, width: 10.0),
                             new GestureDetector(
                                 onTap: () {
-                                  widget.deleteStudySet();
+                                  // TODO: Implement delete study set
                                 },
                                 child: Icon(Icons.delete,
                                     semanticLabel: 'Delete Study set'))

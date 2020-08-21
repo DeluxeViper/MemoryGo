@@ -1,39 +1,18 @@
-import 'package:first_app/main.dart';
-import 'package:first_app/study_set.dart';
+import 'package:first_app/model/StudySet.dart';
+import 'package:first_app/pages/studyset_list.dart';
+import 'package:first_app/studyset_card.dart';
 import 'package:flutter/material.dart';
 
-class AddSet extends StatefulWidget {
-  final MyHomePageState myHomePageState;
+import '../database_helper.dart';
 
-  AddSet(this.myHomePageState);
-
+class AddStudySet extends StatefulWidget {
   @override
-  State<StatefulWidget> createState() {
-    return AddSetState();
-  }
+  State<StatefulWidget> createState() => AddStudySetState();
 }
 
-class AddSetState extends State<AddSet> {
+class AddStudySetState extends State<AddStudySet> {
   TextEditingController nameOfSetController = new TextEditingController();
-
-  static String getCurrentDate() {
-    var date = new DateTime.now().toString();
-    var dateParse = DateTime.parse(date);
-    var formattedDate =
-        "${dateParse.day.toString().padLeft(2, '0')}-${dateParse.month.toString().padLeft(2, '0')}-${dateParse.year} ${dateParse.hour.toString().padLeft(2, '0')}:${dateParse.minute.toString().padLeft(2, '0')}";
-
-    return formattedDate;
-  }
-
-  void addSet() {
-    widget.myHomePageState.addToStudySet(new StudySet(
-      myHomePageState: widget.myHomePageState,
-      nameOfSet: nameOfSetController.text,
-      dateCreated: getCurrentDate(),
-      numOfCards: 0,
-    ));
-    Navigator.pop(context);
-  }
+  DatabaseHelper helper = DatabaseHelper();
 
   @override
   Widget build(BuildContext context) {
@@ -45,7 +24,7 @@ class AddSetState extends State<AddSet> {
           Padding(
               padding: EdgeInsets.only(right: 20.0),
               child: GestureDetector(
-                  onTap: () => addSet(),
+                  onTap: () => _addSet(),
                   child: Icon(Icons.keyboard_arrow_right)))
         ],
       ),
@@ -59,10 +38,36 @@ class AddSetState extends State<AddSet> {
                 controller: nameOfSetController,
                 decoration: InputDecoration(
                     border: OutlineInputBorder(), labelText: 'Study Set Name'),
-                onSubmitted: (value) => addSet(),
+                onSubmitted: (value) => _addSet(),
               )),
         ],
       ),
     );
+  }
+
+  void _addSet() async {
+    print('Adding set');
+    StudySet studySet = new StudySet('', 0, []);
+    int result;
+    studySet.title = nameOfSetController.text;
+    if (studySet.id != null) {
+      // Case 1: Update Operation -> Studyset exists
+      result = await helper.updateStudySet(studySet);
+    } else {
+      result = await helper.insertStudySet(studySet);
+    }
+
+    if (result != 0) {
+      // Success
+      print('Studyset saved Successfully.');
+      // _showAlertDialog('Status', 'Studyset saved Successfully.');
+    } else {
+      // Failure
+      print('Problem saving Studyset.');
+      // _showAlertDialog('Status', 'Problem saving Studyset.');
+    }
+
+    // Update list with studyset and return back to the page
+    Navigator.pop(context, true);
   }
 }

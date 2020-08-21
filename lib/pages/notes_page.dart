@@ -2,12 +2,12 @@ import 'package:first_app/pages/add_note_page.dart';
 import 'package:flutter/material.dart';
 
 import '../note.dart';
-import '../study_set.dart';
+import '../studyset_card.dart';
 
 class NotesPage extends StatefulWidget {
   final String title;
   final List<Note> notes;
-  final StudySetState studySetState;
+  final StudySetCardState studySetState;
 
   NotesPage({this.studySetState, @required this.title, @required this.notes});
 
@@ -18,9 +18,8 @@ class NotesPage extends StatefulWidget {
 }
 
 // Note: might want to add notes array to note page?
-// Problem: adding a note wont change anything (because notes list is final)?
 class NotesPageState extends State<NotesPage> {
-  StudySetState studySetState;
+  StudySetCardState studySetState;
 
   NotesPageState(this.studySetState);
 
@@ -34,6 +33,7 @@ class NotesPageState extends State<NotesPage> {
       studySetState.notes.add(note);
       studySetState.numOfCards++;
     });
+    print("StudySetState: $studySetState");
     studySetState.editNumOfCards(studySetState.numOfCards);
   }
 

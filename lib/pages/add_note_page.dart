@@ -4,7 +4,7 @@ import 'package:first_app/pages/notes_page.dart';
 import 'package:flutter/material.dart';
 import 'add_study_set_page.dart';
 import '../note.dart';
-import '../study_set.dart';
+import '../studyset_card.dart';
 
 class AddNotePage extends StatefulWidget {
   final NotesPageState notesPageState;
@@ -41,12 +41,12 @@ class AddNotePageState extends State<AddNotePage> {
   void addNote() {
     String noteTitle = noteNameController.text;
     String noteBody = noteBodyController.text;
-    String dateCreated = AddSetState.getCurrentDate();
+    // String dateCreated = AddStudySetState.getCurrentDate();
 
     notesPageState.addNoteToStudySet(new Note(
       noteBody: noteBody,
       noteTitle: noteTitle,
-      dateCreated: dateCreated,
+      // dateCreated: dateCreated,
     ));
 
     Navigator.pop(context);
