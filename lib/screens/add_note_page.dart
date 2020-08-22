@@ -1,30 +1,29 @@
-import 'dart:ui';
-
 import 'package:first_app/database_helper.dart';
 import 'package:first_app/model/Note.dart';
 import 'package:flutter/material.dart';
-import 'package:sqflite/sqlite_api.dart';
-import 'add_study_set_page.dart';
-import '../note.dart';
-import '../studyset_card.dart';
 
 class AddNotePage extends StatefulWidget {
-  final int studySetId;
+  final Note note;
 
-  AddNotePage(this.studySetId);
+  AddNotePage(this.note);
 
   @override
-  State<StatefulWidget> createState() => AddNotePageState(this.studySetId);
+  State<StatefulWidget> createState() => AddNotePageState(this.note);
 }
 
 class AddNotePageState extends State<AddNotePage> {
-  final TextEditingController noteNameController = new TextEditingController();
-  final TextEditingController noteBodyController = new TextEditingController();
   DatabaseHelper helper = DatabaseHelper();
-  int studySetId;
+  Note note;
   FocusNode focusNode;
+  TextEditingController noteNameController;
+  TextEditingController noteBodyController;
 
-  AddNotePageState(this.studySetId);
+  AddNotePageState(this.note) {
+    noteNameController =
+        new TextEditingController(text: this.note.title.toString());
+    noteBodyController =
+        new TextEditingController(text: this.note.body.toString());
+  }
 
   @override
   void initState() {
@@ -82,9 +81,20 @@ class AddNotePageState extends State<AddNotePage> {
   void _addNote() async {
     String noteTitle = noteNameController.text;
     String noteBody = noteBodyController.text;
+    Note note;
 
-    Note note = Note(this.studySetId, noteTitle, noteBody);
+    // If a note instance was passed into this class, then
+    // make sure the id gets passed into the note
+    if (this.note.id == null) {
+      note = Note(this.note.studySetId, noteTitle, noteBody);
+    } else {
+      note =
+          Note.withId(this.note.id, this.note.studySetId, noteTitle, noteBody);
+    }
+
     int result;
+    print('Note: $note');
+
     if (note.id != null) {
       // Case 1: Update Operation
       result = await helper.updateNote(note);
@@ -95,10 +105,10 @@ class AddNotePageState extends State<AddNotePage> {
 
     if (result != 0) {
       // Success
-      print('Successfully added Note.');
+      print('Successfully added/updated Note.');
     } else {
       // Failure
-      print('Failed to add Note.');
+      print('Failed to add/update Note.');
     }
 
     Navigator.pop(context, true);

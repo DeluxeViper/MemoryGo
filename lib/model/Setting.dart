@@ -1,4 +1,6 @@
 // Settings object for StudySet
+import '../constants.dart';
+
 class Setting {
   String _duration;
   String _frequency;
@@ -7,6 +9,7 @@ class Setting {
 
   Setting(this._duration, this._frequency) {
     _repeat = false;
+    _duration = durationList[0];
     _overwrite = false;
   }
 

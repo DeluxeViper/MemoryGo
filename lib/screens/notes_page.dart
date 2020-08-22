@@ -4,7 +4,6 @@ import 'package:first_app/screens/add_note_page.dart';
 import 'package:flutter/material.dart';
 import 'package:sqflite/sqflite.dart';
 
-import '../Note.dart';
 import 'add_note_page.dart';
 
 class NotesPage extends StatefulWidget {
@@ -51,7 +50,7 @@ class NotesPageState extends State<NotesPage> {
           children: [Expanded(child: getNoteListView())],
         )),
         floatingActionButton: FloatingActionButton(
-          onPressed: () => openAddNotePage(),
+          onPressed: () => openAddNotePage(context: context),
           tooltip: 'Add Note',
           child: Icon(Icons.add),
         ),
@@ -63,7 +62,6 @@ class NotesPageState extends State<NotesPage> {
     return ListView.builder(
         itemCount: this.count,
         itemBuilder: (BuildContext context, int index) {
-          // TODO: Implement notes list
           return Container(
               width: double.infinity - 20,
               margin: EdgeInsets.all(20.0),
@@ -93,7 +91,11 @@ class NotesPageState extends State<NotesPage> {
                           child: new Row(
                             children: [
                               new GestureDetector(
-                                  onTap: () => {}, // TODO: Implement edit note
+                                  onTap: () {
+                                    openAddNotePage(
+                                        context: context,
+                                        note: notesList[index]);
+                                  },
                                   child: Icon(
                                     Icons.edit,
                                     semanticLabel: 'Edit Note',
@@ -144,21 +146,34 @@ class NotesPageState extends State<NotesPage> {
     });
   }
 
-  void openAddNotePage({Note note}) async {
+  void openAddNotePage({@required BuildContext context, Note note}) async {
     bool result;
     if (note != null) {
+      // Case 1: Update Operation
+      result = await Navigator.of(context)
+          .push(MaterialPageRoute(builder: (context) => new AddNotePage(note)));
     } else {
-      result = await Navigator.of(context).push(
-          MaterialPageRoute(builder: (context) => new AddNotePage(studySetId)));
+      // Case 2: Insert Operation
+      result = await Navigator.of(context).push(MaterialPageRoute(
+          builder: (context) =>
+              new AddNotePage(new Note(this.studySetId, '', ''))));
     }
 
     if (result == true) {
-      // Successfully added Note
+      // Successfully added/updated Note
       updateNoteListView();
-      _showSnackBar(context, 'Successfully added Note');
+      if (note == null) {
+        _showSnackBar(context, 'Successfully added Note');
+      } else {
+        _showSnackBar(context, 'Successfully updated Note');
+      }
     } else {
-      // Failure to add Note
-      _showSnackBar(context, 'Failed to add Note');
+      // Failure to add/update Note
+      // if (note == null) {
+      //   _showSnackBar(context, 'Failed to add Note');
+      // } else {
+      //   _showSnackBar(context, 'Failed to update Note');
+      // }
     }
   }
 }

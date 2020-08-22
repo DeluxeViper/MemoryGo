@@ -7,7 +7,6 @@ class StudySet {
   String _date;
   int _numCards;
   List<Note> _notes;
-  Setting setting; // TODO: Configure this
 
   StudySet(this._title, this._numCards, this._notes) {
     _date = getCurrentDate();

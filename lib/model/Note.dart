@@ -63,4 +63,8 @@ class Note {
 
     return formattedDate;
   }
+
+  String toString() {
+    return 'id: $id, studySetId: $studySetId, title: $title, body: $body, date: $date';
+  }
 }
