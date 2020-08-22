@@ -33,12 +33,12 @@ class DatabaseHelper {
 
   Future<Database> get database async {
     if (_database == null) {
-      _database = await initStudySetDatabase();
+      _database = await initializeDatabase();
     }
     return _database;
   }
 
-  Future<Database> initStudySetDatabase() async {
+  Future<Database> initializeDatabase() async {
     Directory directory = await getApplicationDocumentsDirectory();
     String path = directory.path + 'memoryGoDb.db';
 

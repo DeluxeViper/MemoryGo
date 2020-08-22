@@ -1,29 +1,30 @@
 import 'dart:ui';
 
-import 'package:first_app/pages/notes_page.dart';
+import 'package:first_app/database_helper.dart';
+import 'package:first_app/model/Note.dart';
 import 'package:flutter/material.dart';
+import 'package:sqflite/sqlite_api.dart';
 import 'add_study_set_page.dart';
 import '../note.dart';
 import '../studyset_card.dart';
 
 class AddNotePage extends StatefulWidget {
-  final NotesPageState notesPageState;
+  final int studySetId;
 
-  AddNotePage(this.notesPageState);
+  AddNotePage(this.studySetId);
 
   @override
-  State<StatefulWidget> createState() {
-    return AddNotePageState(this.notesPageState);
-  }
+  State<StatefulWidget> createState() => AddNotePageState(this.studySetId);
 }
 
 class AddNotePageState extends State<AddNotePage> {
   final TextEditingController noteNameController = new TextEditingController();
   final TextEditingController noteBodyController = new TextEditingController();
-  final NotesPageState notesPageState;
+  DatabaseHelper helper = DatabaseHelper();
+  int studySetId;
   FocusNode focusNode;
 
-  AddNotePageState(this.notesPageState);
+  AddNotePageState(this.studySetId);
 
   @override
   void initState() {
@@ -37,21 +38,6 @@ class AddNotePageState extends State<AddNotePage> {
     super.dispose();
   }
 
-  // Creating new note and adding it to the list of notes of study set
-  void addNote() {
-    String noteTitle = noteNameController.text;
-    String noteBody = noteBodyController.text;
-    // String dateCreated = AddStudySetState.getCurrentDate();
-
-    notesPageState.addNoteToStudySet(new Note(
-      noteBody: noteBody,
-      noteTitle: noteTitle,
-      // dateCreated: dateCreated,
-    ));
-
-    Navigator.pop(context);
-  }
-
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
@@ -62,7 +48,7 @@ class AddNotePageState extends State<AddNotePage> {
           Padding(
               padding: EdgeInsets.only(right: 20.0),
               child: GestureDetector(
-                  onTap: () => addNote(),
+                  onTap: () => _addNote(),
                   child: Icon(Icons.keyboard_arrow_right)))
         ],
       ),
@@ -86,10 +72,35 @@ class AddNotePageState extends State<AddNotePage> {
                 controller: noteBodyController,
                 decoration: InputDecoration(
                     border: OutlineInputBorder(), labelText: 'Note Body'),
-                onSubmitted: (value) => addNote(),
+                onSubmitted: (value) => _addNote(),
               )),
         ],
       ),
     );
+  }
+
+  void _addNote() async {
+    String noteTitle = noteNameController.text;
+    String noteBody = noteBodyController.text;
+
+    Note note = Note(this.studySetId, noteTitle, noteBody);
+    int result;
+    if (note.id != null) {
+      // Case 1: Update Operation
+      result = await helper.updateNote(note);
+    } else {
+      // Case 2: Insert Operation
+      result = await helper.insertNote(note);
+    }
+
+    if (result != 0) {
+      // Success
+      print('Successfully added Note.');
+    } else {
+      // Failure
+      print('Failed to add Note.');
+    }
+
+    Navigator.pop(context, true);
   }
 }

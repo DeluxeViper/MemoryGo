@@ -1,5 +1,5 @@
 import 'package:first_app/model/StudySet.dart';
-import 'package:first_app/pages/studyset_list.dart';
+import 'package:first_app/screens/studyset_list.dart';
 import 'package:first_app/studyset_card.dart';
 import 'package:flutter/material.dart';
 

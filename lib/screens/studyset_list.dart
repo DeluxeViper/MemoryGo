@@ -1,6 +1,6 @@
 import 'package:first_app/database_helper.dart';
 import 'package:first_app/model/StudySet.dart';
-import 'package:first_app/pages/settings_page.dart';
+import 'package:first_app/screens/settings_page.dart';
 import 'package:flutter/material.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -69,7 +69,7 @@ class StudySetListState extends State<StudySetList> {
                   child: InkWell(
                       splashColor: Colors.blue.withAlpha(20),
                       onTap: () {
-                        openNotesPage();
+                        openNotesPage(studySets[index]);
                       },
                       // Study set
                       child: Column(
@@ -134,7 +134,7 @@ class StudySetListState extends State<StudySetList> {
   }
 
   void updateListView() {
-    final Future<Database> dbFuture = databaseHelper.initStudySetDatabase();
+    final Future<Database> dbFuture = databaseHelper.initializeDatabase();
     dbFuture.then((database) {
       Future<List<StudySet>> studySetListFuture =
           databaseHelper.getStudySetList();
@@ -162,9 +162,27 @@ class StudySetListState extends State<StudySetList> {
     }
   }
 
-  void openNotesPage() {
-    Navigator.of(context).push(MaterialPageRoute(
-      builder: (context) => NotesPage(),
+  void openNotesPage(StudySet studySet) async {
+    int result = await Navigator.of(context).push(MaterialPageRoute(
+      builder: (context) => NotesPage(
+        title: studySet.title,
+        studySetId: studySet.id,
+      ),
     ));
+
+    // Updating number of cards in study set once returning from notes page
+    if (result != null) {
+      studySet.numCards = result;
+      int updateResult = await databaseHelper.updateStudySet(studySet);
+
+      if (updateResult != 0) {
+        // Success
+        // print('Successfully updated number of cards.');
+        updateListView();
+      } else {
+        // Failure
+        // print('Failure to update number of cards');
+      }
+    }
   }
 }

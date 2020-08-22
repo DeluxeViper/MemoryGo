@@ -1,9 +1,9 @@
 import 'package:first_app/main.dart';
-import 'package:first_app/pages/settings_page.dart';
-import 'package:first_app/pages/studyset_list.dart';
+import 'package:first_app/screens/notes_page.dart';
+import 'package:first_app/screens/settings_page.dart';
+import 'package:first_app/screens/studyset_list.dart';
 import 'package:flutter/material.dart';
 import 'note.dart';
-import 'pages/notes_page.dart';
 
 // BUG: Notes of study sets are only bound to the
 // listview position of study sets and not the actual
@@ -23,9 +23,9 @@ class StudySetCard extends StatefulWidget {
 class StudySetCardState extends State<StudySetCard> {
   var nameOfSet, dateCreated, numOfCards;
 
-  List<Note> notes = [];
+  List<NoteCard> notes = [];
 
-  bool removeNote(Note note) {
+  bool removeNote(NoteCard note) {
     if (notes.contains(note)) {
       notes.remove(note);
       return true;
@@ -66,11 +66,7 @@ class StudySetCardState extends State<StudySetCard> {
                 splashColor: Colors.blue.withAlpha(20),
                 onTap: () {
                   Navigator.of(context).push(MaterialPageRoute(
-                    builder: (context) => NotesPage(
-                      studySetState: this,
-                      title: widget.nameOfSet,
-                      notes: this.notes,
-                    ),
+                    builder: (context) => NotesPage(),
                   ));
                 },
                 child: Column(

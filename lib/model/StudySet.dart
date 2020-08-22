@@ -1,4 +1,5 @@
 import 'Note.dart';
+import 'Setting.dart';
 
 class StudySet {
   int _id;
@@ -6,6 +7,7 @@ class StudySet {
   String _date;
   int _numCards;
   List<Note> _notes;
+  Setting setting; // TODO: Configure this
 
   StudySet(this._title, this._numCards, this._notes) {
     _date = getCurrentDate();
@@ -32,8 +34,6 @@ class StudySet {
   set numCards(int newNum) {
     this._numCards = newNum;
   }
-
-  // TODO: CRUD operations for notes
 
   // Convert a StudySet object into a Map object
   Map<String, dynamic> setToMap() {

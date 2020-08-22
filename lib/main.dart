@@ -1,4 +1,4 @@
-import 'package:first_app/pages/studyset_list.dart';
+import 'package:first_app/screens/studyset_list.dart';
 import 'package:flutter/material.dart';
 
 void main() {

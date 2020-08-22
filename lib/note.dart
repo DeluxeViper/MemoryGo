@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
-class Note extends StatefulWidget {
+class NoteCard extends StatefulWidget {
   final noteTitle, noteBody, dateCreated;
 
-  Note({this.noteTitle, this.noteBody, this.dateCreated});
+  NoteCard({this.noteTitle, this.noteBody, this.dateCreated});
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
@@ -12,11 +12,11 @@ class Note extends StatefulWidget {
 
   @override
   State<StatefulWidget> createState() {
-    return new _NoteState();
+    return new _NoteCardState();
   }
 }
 
-class _NoteState extends State<Note> {
+class _NoteCardState extends State<NoteCard> {
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
     return "Note title: ${widget.noteTitle}\nNote Body: ${widget.noteBody}\nDate Created: ${widget.dateCreated}";
