@@ -1,27 +1,98 @@
-import 'dart:io';
-
+import 'package:first_app/constants.dart';
+import 'package:first_app/database_helper.dart';
+import 'package:first_app/model/StudySet.dart';
 import 'package:flutter/material.dart';
 
 class SettingsPage extends StatefulWidget {
+  final StudySet studySet;
+
+  SettingsPage(this.studySet);
+
   @override
   State<StatefulWidget> createState() {
-    return SettingsPageState();
+    return SettingsPageState(this.studySet);
   }
 }
 
 class SettingsPageState extends State<SettingsPage> {
-  List<String> durations = <String>['30 Mins', '60 Mins', '2 Hrs'];
-  String _selectedDuration = '30 Mins';
-  bool vLowChecked = false,
-      lowChecked = false,
-      medChecked = false,
-      highChecked = false,
-      repeatVal = false,
-      overwriteVal = false;
+  DatabaseHelper helper = new DatabaseHelper();
+  String _selectedDuration = durationList[0];
+  bool vLowChecked,
+      lowChecked,
+      medChecked,
+      highChecked,
+      repeatVal,
+      overwriteVal;
+
+  StudySet studySet;
+
+  SettingsPageState(this.studySet) {
+    _selectedDuration = this.studySet.duration;
+    if (studySet.frequency == freqList[0]) {
+      vLowChecked = true;
+      lowChecked = false;
+      medChecked = false;
+      highChecked = false;
+    } else if (studySet.frequency == freqList[1]) {
+      vLowChecked = false;
+      lowChecked = true;
+      medChecked = false;
+      highChecked = false;
+    } else if (studySet.frequency == freqList[2]) {
+      vLowChecked = false;
+      lowChecked = false;
+      medChecked = true;
+      highChecked = false;
+    } else if (studySet.frequency == freqList[3]) {
+      vLowChecked = false;
+      lowChecked = false;
+      medChecked = false;
+      highChecked = true;
+    }
+    repeatVal = studySet.repeat;
+    overwriteVal = studySet.overwrite;
+  }
 
   void onSaved() {
-    // TODO: Implement onSaved method
+    // Duration of study set
+    studySet.duration = _selectedDuration;
+
+    // Frequency of study set
+    if (vLowChecked == true) {
+      studySet.frequency = freqList[0];
+    } else if (lowChecked == true) {
+      studySet.frequency = freqList[1];
+    } else if (medChecked == true) {
+      studySet.frequency = freqList[2];
+    } else if (highChecked == true) {
+      studySet.frequency = freqList[3];
+    }
+
+    // Repeat of study set
+    studySet.repeat = repeatVal;
+
+    // Overwrite of study set
+    studySet.overwrite = overwriteVal;
+
+    print("Study set settings saved as: $studySet");
+
+    _updateSet(studySet);
+
     Navigator.pop(context);
+  }
+
+  void _updateSet(StudySet studySet) async {
+    int result = await helper.updateStudySet(studySet);
+
+    if (result != 0) {
+      // Successfully saved settings
+      print("Saved settings successfully.");
+      var studySetList = await helper.getStudySetList();
+      print(studySetList.toString());
+    } else {
+      // Failed to save settings
+      print("Failed to save settings.");
+    }
   }
 
   @override
@@ -53,7 +124,7 @@ class SettingsPageState extends State<SettingsPage> {
                   child: new DropdownButton<String>(
                       hint: Text('30 Mins'),
                       value: _selectedDuration,
-                      items: durations.map((String value) {
+                      items: durationList.map((String value) {
                         return new DropdownMenuItem<String>(
                             value: value, child: new Text(value));
                       }).toList(),
@@ -81,7 +152,12 @@ class SettingsPageState extends State<SettingsPage> {
                   value: vLowChecked,
                   onChanged: (bool value) {
                     setState(() {
-                      vLowChecked = value;
+                      if (value == true) {
+                        vLowChecked = value;
+                        lowChecked = !value;
+                        medChecked = !value;
+                        highChecked = !value;
+                      }
                     });
                   }),
               new CheckboxListTile(
@@ -89,7 +165,12 @@ class SettingsPageState extends State<SettingsPage> {
                   value: lowChecked,
                   onChanged: (bool value) {
                     setState(() {
-                      lowChecked = value;
+                      if (value == true) {
+                        vLowChecked = !value;
+                        lowChecked = value;
+                        medChecked = !value;
+                        highChecked = !value;
+                      }
                     });
                   }),
               new CheckboxListTile(
@@ -97,7 +178,12 @@ class SettingsPageState extends State<SettingsPage> {
                   value: medChecked,
                   onChanged: (bool value) {
                     setState(() {
-                      medChecked = value;
+                      if (value == true) {
+                        vLowChecked = !value;
+                        lowChecked = !value;
+                        medChecked = value;
+                        highChecked = !value;
+                      }
                     });
                   }),
               new CheckboxListTile(
@@ -105,7 +191,12 @@ class SettingsPageState extends State<SettingsPage> {
                   value: highChecked,
                   onChanged: (bool value) {
                     setState(() {
-                      highChecked = value;
+                      if (value == true) {
+                        vLowChecked = !value;
+                        lowChecked = !value;
+                        medChecked = !value;
+                        highChecked = value;
+                      }
                     });
                   }),
             ],

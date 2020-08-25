@@ -1,6 +1,5 @@
 import 'package:first_app/model/StudySet.dart';
 import 'package:first_app/screens/studyset_list.dart';
-import 'package:first_app/studyset_card.dart';
 import 'package:flutter/material.dart';
 
 import '../database_helper.dart';
@@ -47,7 +46,7 @@ class AddStudySetState extends State<AddStudySet> {
 
   void _addSet() async {
     print('Adding set');
-    StudySet studySet = new StudySet('', 0, []);
+    StudySet studySet = new StudySet('', 0);
     int result;
     studySet.title = nameOfSetController.text;
     if (studySet.id != null) {

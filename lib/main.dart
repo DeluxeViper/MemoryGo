@@ -1,3 +1,4 @@
+import 'package:first_app/constants.dart';
 import 'package:first_app/screens/studyset_list.dart';
 import 'package:flutter/material.dart';
 
@@ -12,7 +13,7 @@ class MyApp extends StatelessWidget {
       title: 'MemoryGo',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        primarySwatch: Colors.green,
+        primaryColor: kPrimaryColor,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
       home: StudySetList(title: 'MemoryGo'),

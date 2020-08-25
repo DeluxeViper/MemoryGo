@@ -4,7 +4,6 @@ import 'package:first_app/screens/settings_page.dart';
 import 'package:flutter/material.dart';
 import 'package:sqflite/sqflite.dart';
 
-import '../studyset_card.dart';
 import 'add_study_set_page.dart';
 import 'notes_page.dart';
 
@@ -98,7 +97,8 @@ class StudySetListState extends State<StudySetList> {
                                 mainAxisAlignment: MainAxisAlignment.end,
                                 children: [
                                   new GestureDetector(
-                                      onTap: () => openSettingsPage(),
+                                      onTap: () =>
+                                          openSettingsPage(studySets[index]),
                                       child: Icon(
                                         Icons.settings,
                                         semanticLabel: 'Study set settings',
@@ -147,9 +147,9 @@ class StudySetListState extends State<StudySetList> {
     });
   }
 
-  void openSettingsPage() {
-    Navigator.of(context)
-        .push(MaterialPageRoute(builder: (context) => new SettingsPage()));
+  void openSettingsPage(StudySet studySet) {
+    Navigator.of(context).push(
+        MaterialPageRoute(builder: (context) => new SettingsPage(studySet)));
   }
 
   void goToAddSetPage() async {

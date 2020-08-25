@@ -17,6 +17,12 @@ class DatabaseHelper {
   String colDate = 'date';
   String colNumCards = 'numCards';
 
+  // Study set Settings columns
+  String colDur = 'duration';
+  String colFreq = 'frequency';
+  String colRepeat = 'repeat';
+  String colOvwrite = 'overwrite';
+
   // Notes relevant columns
   String notesTable = 'notes_table';
   String colStudySetId = 'studySetId';
@@ -40,7 +46,7 @@ class DatabaseHelper {
 
   Future<Database> initializeDatabase() async {
     Directory directory = await getApplicationDocumentsDirectory();
-    String path = directory.path + 'memoryGoDb.db';
+    String path = directory.path + 'memoryGoDatabase.db';
 
     // open/create database at path
     var memoryGoDatabase =
@@ -51,7 +57,7 @@ class DatabaseHelper {
 
   void _createDb(Database db, int newVersion) async {
     await db.execute(
-        'CREATE TABLE $studySetsTable($colId INTEGER PRIMARY KEY AUTOINCREMENT, $colTitle TEXT, $colDate TEXT, $colNumCards TEXT)');
+        'CREATE TABLE $studySetsTable($colId INTEGER PRIMARY KEY AUTOINCREMENT, $colTitle TEXT, $colDate TEXT, $colNumCards TEXT, $colDur TEXT, $colFreq TEXT, $colRepeat TEXT, $colOvwrite TEXT)');
 
     await db.execute(
         'CREATE TABLE $notesTable($colId INTEGER PRIMARY KEY AUTOINCREMENT, $colStudySetId INTEGER, $colTitle TEXT, $colBody TEXT, $colDate TEXT)');
