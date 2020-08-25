@@ -164,10 +164,7 @@ class StudySetListState extends State<StudySetList> {
 
   void openNotesPage(StudySet studySet) async {
     int result = await Navigator.of(context).push(MaterialPageRoute(
-      builder: (context) => NotesPage(
-        title: studySet.title,
-        studySetId: studySet.id,
-      ),
+      builder: (context) => NotesPage(studySet),
     ));
 
     // Updating number of cards in study set once returning from notes page

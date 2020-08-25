@@ -53,48 +53,6 @@ class SettingsPageState extends State<SettingsPage> {
     overwriteVal = studySet.overwrite;
   }
 
-  void onSaved() {
-    // Duration of study set
-    studySet.duration = _selectedDuration;
-
-    // Frequency of study set
-    if (vLowChecked == true) {
-      studySet.frequency = freqList[0];
-    } else if (lowChecked == true) {
-      studySet.frequency = freqList[1];
-    } else if (medChecked == true) {
-      studySet.frequency = freqList[2];
-    } else if (highChecked == true) {
-      studySet.frequency = freqList[3];
-    }
-
-    // Repeat of study set
-    studySet.repeat = repeatVal;
-
-    // Overwrite of study set
-    studySet.overwrite = overwriteVal;
-
-    print("Study set settings saved as: $studySet");
-
-    _updateSet(studySet);
-
-    Navigator.pop(context);
-  }
-
-  void _updateSet(StudySet studySet) async {
-    int result = await helper.updateStudySet(studySet);
-
-    if (result != 0) {
-      // Successfully saved settings
-      print("Saved settings successfully.");
-      var studySetList = await helper.getStudySetList();
-      print(studySetList.toString());
-    } else {
-      // Failed to save settings
-      print("Failed to save settings.");
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -243,8 +201,8 @@ class SettingsPageState extends State<SettingsPage> {
           new Row(mainAxisAlignment: MainAxisAlignment.center, children: [
             RaisedButton(
               elevation: 5,
-              padding: EdgeInsets.only(
-                  top: 10.0, bottom: 10.0, left: 50.0, right: 50.0),
+              padding:
+                  EdgeInsets.only(top: 10.0, bottom: 10.0, left: 50, right: 50),
               child: Text('Save'),
               textColor: Colors.white,
               color: Colors.purple,
@@ -254,5 +212,43 @@ class SettingsPageState extends State<SettingsPage> {
         ],
       ),
     );
+  }
+
+  void onSaved() {
+    // Duration of study set
+    studySet.duration = _selectedDuration;
+
+    // Frequency of study set
+    if (vLowChecked == true) {
+      studySet.frequency = freqList[0];
+    } else if (lowChecked == true) {
+      studySet.frequency = freqList[1];
+    } else if (medChecked == true) {
+      studySet.frequency = freqList[2];
+    } else if (highChecked == true) {
+      studySet.frequency = freqList[3];
+    }
+
+    // Repeat of study set
+    studySet.repeat = repeatVal;
+
+    // Overwrite of study set
+    studySet.overwrite = overwriteVal;
+
+    _updateSet(studySet);
+
+    Navigator.pop(context);
+  }
+
+  void _updateSet(StudySet studySet) async {
+    int result = await helper.updateStudySet(studySet);
+
+    if (result != 0) {
+      // Successfully saved settings
+      var studySetList = await helper.getStudySetList();
+      print(studySetList.toString());
+    } else {
+      // Failed to save settings
+    }
   }
 }
