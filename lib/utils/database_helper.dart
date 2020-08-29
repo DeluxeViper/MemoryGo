@@ -1,11 +1,10 @@
 import 'dart:io';
-
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
 import 'dart:async';
 
-import 'model/Note.dart';
-import 'model/StudySet.dart';
+import '../model/Note.dart';
+import '../model/StudySet.dart';
 
 class DatabaseHelper {
   static DatabaseHelper _databaseHelper; // Singleton DatabaseHelper

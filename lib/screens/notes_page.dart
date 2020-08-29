@@ -1,10 +1,13 @@
 import 'package:first_app/constants.dart';
-import 'package:first_app/database_helper.dart';
+import 'package:first_app/utils/database_helper.dart';
 import 'package:first_app/model/Note.dart';
 import 'package:first_app/model/StudySet.dart';
 import 'package:first_app/screens/add_note_page.dart';
 import 'package:first_app/screens/settings_page.dart';
+import 'package:first_app/utils/notification_helper.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:first_app/main.dart';
 import 'package:sqflite/sqflite.dart';
 
 import 'add_note_page.dart';
@@ -26,7 +29,9 @@ class NotesPageState extends State<NotesPage> {
   List<Note> notesList;
   DatabaseHelper helper = DatabaseHelper();
   StudySet studySet;
-
+  // static const MethodChannel androidPlat = MethodChannel('memorygo/service');
+  static const MethodChannel androidPlatform =
+      MethodChannel('com.example.first_app/notebubble');
   NotesPageState(this.studySet);
 
   @override
@@ -65,6 +70,8 @@ class NotesPageState extends State<NotesPage> {
                     RaisedButton(
                       onPressed: () {
                         // TODO: Implement Go button
+                        openNoteBubble(notesList[0]);
+                        // connectToService();
                       },
                       color: kPrimaryColor,
                       textColor: Colors.white,
@@ -142,6 +149,25 @@ class NotesPageState extends State<NotesPage> {
                 ],
               )));
         });
+  }
+
+  void openNoteBubble(Note note) async {
+    // try {
+    //   await androidPlatform.invokeMethod('openNoteBubble');
+    // } catch (e) {
+    //   print(e);
+    // }
+    var now = new DateTime.now();
+    var notificationTime = new DateTime(
+        now.year, now.month, now.day, now.hour, now.minute, now.second + 2);
+
+    configureNotifications();
+    scheduleNotification(flutterLocalNotificationsPlugin, note.id.toString(),
+        note.title, note.body, notificationTime);
+  }
+
+  void configureNotifications() {
+    // TODO: configure notifications based on settings set
   }
 
   void _delete(BuildContext context, Note note) async {

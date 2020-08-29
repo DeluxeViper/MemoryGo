@@ -1,8 +1,7 @@
 import 'package:first_app/model/StudySet.dart';
-import 'package:first_app/screens/studyset_list.dart';
 import 'package:flutter/material.dart';
 
-import '../database_helper.dart';
+import '../utils/database_helper.dart';
 
 class AddStudySet extends StatefulWidget {
   @override
