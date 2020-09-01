@@ -1,12 +1,17 @@
 package com.example.first_app;
 
 import android.content.Intent;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 
-import com.example.first_app.NoteBubbleService;
+import com.example.MemoryGo.NoteBubbleService;
+import com.google.android.material.snackbar.Snackbar;
 
 import java.util.Objects;
 
@@ -19,7 +24,7 @@ import io.flutter.embedding.android.FlutterActivity;
 
 
 public class MainActivity extends FlutterActivity {
-    public static final String CHANNEL = "com.example.first_app/notebubble";
+    public static final String CHANNEL = "com.example.MemoryGo/notebubble";
 
     @Override
     public void configureFlutterEngine(@NonNull FlutterEngine flutterEngine) {
@@ -31,10 +36,16 @@ public class MainActivity extends FlutterActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         new MethodChannel(Objects.requireNonNull(getFlutterEngine()).getDartExecutor().getBinaryMessenger(), CHANNEL).setMethodCallHandler(new MethodChannel.MethodCallHandler() {
+            @RequiresApi(api = Build.VERSION_CODES.M)
             @Override
             public void onMethodCall(@NonNull MethodCall call, @NonNull MethodChannel.Result result) {
                 if (call.method.equals("openNoteBubble")) {
-                    startNoteBubbleService();
+
+                    if (Settings.canDrawOverlays(MainActivity.this)) {
+                        Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                                Uri.parse("package:" + getPackageName()));
+                        startActivityForResult(intent, 0);
+                    }
                     result.success("Opening note bubble service.");
                 }
             }
@@ -44,5 +55,14 @@ public class MainActivity extends FlutterActivity {
     private void startNoteBubbleService() {
         startService(new Intent(MainActivity.this, NoteBubbleService.class));
         finish();
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == 0) {
+            startNoteBubbleService();
+        } else {
+            Snackbar.make(findViewById(android.R.id.content), "Error. Please enable Draw Overlay Permissions in Settings for popup to work.", Snackbar.LENGTH_LONG).show();
+        }
     }
 }
