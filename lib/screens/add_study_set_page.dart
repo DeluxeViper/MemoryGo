@@ -1,4 +1,4 @@
-import 'package:first_app/model/StudySet.dart';
+import 'package:MemoryGo/model/StudySet.dart';
 import 'package:flutter/material.dart';
 
 import '../utils/database_helper.dart';

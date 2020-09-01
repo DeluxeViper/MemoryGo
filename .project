@@ -1,14 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>first_app</name>
-	<comment>Project first_app created by Buildship.</comment>
-	<projects>
-	</projects>
+	<name>MemoryGo</name>
+	<comment>Project MemoryGo created by Buildship.</comment>
+	<projects></projects>
 	<buildSpec>
 		<buildCommand>
 			<name>org.eclipse.buildship.core.gradleprojectbuilder</name>
-			<arguments>
-			</arguments>
+			<arguments></arguments>
 		</buildCommand>
 	</buildSpec>
 	<natures>

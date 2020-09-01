@@ -1,13 +1,13 @@
-import 'package:first_app/constants.dart';
-import 'package:first_app/utils/database_helper.dart';
-import 'package:first_app/model/Note.dart';
-import 'package:first_app/model/StudySet.dart';
-import 'package:first_app/screens/add_note_page.dart';
-import 'package:first_app/screens/settings_page.dart';
-import 'package:first_app/utils/notification_helper.dart';
+import 'package:MemoryGo/constants.dart';
+import 'package:MemoryGo/utils/database_helper.dart';
+import 'package:MemoryGo/model/Note.dart';
+import 'package:MemoryGo/model/StudySet.dart';
+import 'package:MemoryGo/screens/add_note_page.dart';
+import 'package:MemoryGo/screens/settings_page.dart';
+import 'package:MemoryGo/utils/notification_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:first_app/main.dart';
+import 'package:MemoryGo/main.dart';
 import 'package:sqflite/sqflite.dart';
 
 import 'add_note_page.dart';
@@ -31,8 +31,10 @@ class NotesPageState extends State<NotesPage> {
   StudySet studySet;
   // static const MethodChannel androidPlat = MethodChannel('memorygo/service');
   static const MethodChannel androidPlatform =
-      MethodChannel('com.example.first_app/notebubble');
+      MethodChannel('com.example.MemoryGo/notebubble');
   NotesPageState(this.studySet);
+
+  static final String androidChannel = "com.flutter.io/snackbar";
 
   @override
   Widget build(BuildContext context) {
@@ -69,9 +71,8 @@ class NotesPageState extends State<NotesPage> {
                   children: [
                     RaisedButton(
                       onPressed: () {
-                        // TODO: Implement Go button
-                        openNoteBubble(notesList[0]);
-                        // connectToService();
+                        // TODO: Implement GO button in iOS
+                        openNoteBubble(notesList);
                       },
                       color: kPrimaryColor,
                       textColor: Colors.white,
@@ -151,23 +152,48 @@ class NotesPageState extends State<NotesPage> {
         });
   }
 
-  void openNoteBubble(Note note) async {
-    // try {
-    //   await androidPlatform.invokeMethod('openNoteBubble');
-    // } catch (e) {
-    //   print(e);
-    // }
+  void openNoteBubble(List<Note> notesList) async {
+    List<Map<String, dynamic>> notesListMap = List<Map<String, dynamic>>();
+    notesList.forEach((note) {
+      notesListMap.add(note.noteToMap());
+    });
+
+    // Starting note bubble service in Android
+    try {
+      await androidPlatform.invokeMethod('openNoteBubble', {
+        "notesListMap": notesListMap,
+        "duration": studySet.duration,
+        "studySetTitle": studySet.title,
+        "frequency": studySet.frequency
+      });
+    } catch (e) {
+      print(e);
+    }
+
     var now = new DateTime.now();
     var notificationTime = new DateTime(
         now.year, now.month, now.day, now.hour, now.minute, now.second + 2);
 
-    configureNotifications();
-    scheduleNotification(flutterLocalNotificationsPlugin, note.id.toString(),
-        note.title, note.body, notificationTime);
+    // configureNotifications(notesList);
+    scheduleNotification(
+        flutterLocalNotificationsPlugin,
+        notesList[0].id.toString(),
+        notesList[0].title,
+        notesList[0].body,
+        notificationTime);
   }
 
-  void configureNotifications() {
+  void configureNotifications(List<Note> notesList) {
     // TODO: configure notifications based on settings set
+
+    var now = new DateTime.now();
+    var notificationTime = new DateTime(
+        now.year, now.month, now.day, now.hour, now.minute, now.second + 2);
+    notesList.forEach((note) {
+      notificationTime.add(Duration(minutes: 1));
+      scheduleNotification(flutterLocalNotificationsPlugin, note.id.toString(),
+          note.title, note.body, notificationTime);
+    });
   }
 
   void _delete(BuildContext context, Note note) async {
@@ -180,6 +206,10 @@ class NotesPageState extends State<NotesPage> {
       // Failure
       _showSnackBar(context, 'Error deleting Note');
     }
+  }
+
+  void androidShowSnackBar(String message) {
+    _showSnackBar(context, message);
   }
 
   void _showSnackBar(BuildContext context, String message) {

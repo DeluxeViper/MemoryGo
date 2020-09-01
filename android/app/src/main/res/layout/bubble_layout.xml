@@ -1,6 +1,63 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+<com.txusballesteros.bubbles.BubbleLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/bubble_view_layout"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal">
 
-</LinearLayout>
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+        <!--Dropdown Note Bubble-->
+        <LinearLayout
+            android:id="@+id/note_bubble_dropdown_layout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/avatar"
+            android:layout_centerVertical="true"
+            android:background="@drawable/note_bubble_dropdown"
+            android:orientation="vertical"
+            android:paddingHorizontal="20dp"
+            android:paddingVertical="20dp"
+            android:visibility="gone">
+
+            <TextView
+                android:id="@+id/study_set_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="20dp"
+                android:gravity="center_vertical"
+                android:text="@string/study_set_title"
+                android:textColor="@android:color/black"
+                android:textSize="17sp"
+                android:textStyle="bold" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/notes_recycler_view"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:scrollbars="vertical" />
+        </LinearLayout>
+
+
+        <ImageView
+            android:id="@+id/avatar"
+            android:layout_width="70dp"
+            android:layout_height="70dp"
+            android:layout_centerHorizontal="true"
+            android:layout_gravity="center"
+            android:background="@mipmap/ic_memorygo_foreground"
+            android:scaleType="centerCrop" />
+
+        <com.nex3z.notificationbadge.NotificationBadge
+            android:id="@+id/badge"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:layout_toEndOf="@id/avatar"
+            app:nbBackground="@drawable/badge_with_shadow"
+            app:nbMaxTextLength="2" />
+    </RelativeLayout>
+
+</com.txusballesteros.bubbles.BubbleLayout>

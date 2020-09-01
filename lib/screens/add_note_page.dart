@@ -1,5 +1,5 @@
-import 'package:first_app/utils/database_helper.dart';
-import 'package:first_app/model/Note.dart';
+import 'package:MemoryGo/utils/database_helper.dart';
+import 'package:MemoryGo/model/Note.dart';
 import 'package:flutter/material.dart';
 
 class AddNotePage extends StatefulWidget {

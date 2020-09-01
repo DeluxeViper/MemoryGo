@@ -1,4 +1,4 @@
-import 'package:first_app/model/NoteNotification.dart';
+import 'package:MemoryGo/model/NoteNotification.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:rxdart/subjects.dart';

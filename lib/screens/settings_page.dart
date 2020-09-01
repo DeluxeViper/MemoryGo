@@ -1,6 +1,6 @@
-import 'package:first_app/constants.dart';
-import 'package:first_app/utils/database_helper.dart';
-import 'package:first_app/model/StudySet.dart';
+import 'package:MemoryGo/constants.dart';
+import 'package:MemoryGo/utils/database_helper.dart';
+import 'package:MemoryGo/model/StudySet.dart';
 import 'package:flutter/material.dart';
 
 class SettingsPage extends StatefulWidget {
