@@ -26,12 +26,13 @@ dependencies:
   sqflite: any
   path_provider: any
   intl: ^0.15.7
-  flutter_local_notifications: ^1.4.2
   rxdart: ^0.23.1
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^0.1.3
+
+  # flutter_local_notifications: ^1.4.2
 
 dev_dependencies:
   flutter_test:
@@ -51,7 +52,6 @@ flutter_launcher_name:
 # following page: https://dart.dev/tools/pub/pubspec  
 # The following section is specific to Flutter.
 flutter:
-
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.

@@ -1,4 +1,5 @@
 // Settings object for StudySet
+// UNUSED CURRENTLY
 import '../constants.dart';
 
 class Setting {

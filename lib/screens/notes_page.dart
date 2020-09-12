@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:MemoryGo/constants.dart';
 import 'package:MemoryGo/utils/database_helper.dart';
 import 'package:MemoryGo/model/Note.dart';
@@ -8,6 +10,7 @@ import 'package:MemoryGo/utils/notification_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:MemoryGo/main.dart';
+// import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:sqflite/sqflite.dart';
 
 import 'add_note_page.dart';
@@ -25,6 +28,7 @@ class NotesPage extends StatefulWidget {
 
 // Note: might want to add notes array to note page?
 class NotesPageState extends State<NotesPage> {
+  bool isSessionEnded;
   int count = 0;
   List<Note> notesList;
   DatabaseHelper helper = DatabaseHelper();
@@ -33,8 +37,6 @@ class NotesPageState extends State<NotesPage> {
   static const MethodChannel androidPlatform =
       MethodChannel('com.example.MemoryGo/notebubble');
   NotesPageState(this.studySet);
-
-  static final String androidChannel = "com.flutter.io/snackbar";
 
   @override
   Widget build(BuildContext context) {
@@ -69,16 +71,45 @@ class NotesPageState extends State<NotesPage> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
+                    // Go Button
                     RaisedButton(
                       onPressed: () {
-                        // TODO: Implement GO button in iOS
-                        openNoteBubble(notesList);
+                        if (Platform.isAndroid) {
+                          if (notesList.isEmpty) {
+                            _showSnackBar(context,
+                                "Error, Cannot start. ${studySet.title} is Empty.");
+                          } else {
+                            openNoteBubble(notesList);
+                          }
+                        } else if (Platform.isIOS) {
+                          scheduleIOSNotifications(notesList);
+                        } else {
+                          _showSnackBar(context, "Platform unrecognized.");
+                        }
                       },
                       color: kPrimaryColor,
                       textColor: Colors.white,
                       child: Padding(
                           padding: EdgeInsets.only(top: 10, bottom: 10),
                           child: Text('Go')),
+                    ),
+                    // Stop Session
+                    RaisedButton(
+                      onPressed: () {
+                        // Stop Session
+                        if (isSessionEnded == true) {
+                          _showSnackBar(
+                              context, "Error. Session is already running.");
+                        } else {
+                          isSessionEnded = true;
+                          stopNotifications();
+                        }
+                      },
+                      color: Color(0xFFFF0000),
+                      textColor: Colors.white,
+                      child: Padding(
+                          padding: EdgeInsets.only(top: 10, bottom: 10),
+                          child: Text('Stop Session')),
                     )
                   ],
                 )),
@@ -96,6 +127,7 @@ class NotesPageState extends State<NotesPage> {
 
   ListView getNoteListView() {
     return ListView.builder(
+        physics: BouncingScrollPhysics(),
         itemCount: this.count,
         itemBuilder: (BuildContext context, int index) {
           return Container(
@@ -164,36 +196,109 @@ class NotesPageState extends State<NotesPage> {
         "notesListMap": notesListMap,
         "duration": studySet.duration,
         "studySetTitle": studySet.title,
-        "frequency": studySet.frequency
+        "frequency": studySet.frequency,
+        "repeat": studySet.repeat.toString(),
+        "overwrite": studySet.overwrite.toString()
       });
     } catch (e) {
       print(e);
     }
-
-    var now = new DateTime.now();
-    var notificationTime = new DateTime(
-        now.year, now.month, now.day, now.hour, now.minute, now.second + 2);
-
-    // configureNotifications(notesList);
-    scheduleNotification(
-        flutterLocalNotificationsPlugin,
-        notesList[0].id.toString(),
-        notesList[0].title,
-        notesList[0].body,
-        notificationTime);
   }
 
-  void configureNotifications(List<Note> notesList) {
-    // TODO: configure notifications based on settings set
+  void scheduleIOSNotifications(List<Note> notesList) async {
+    print("Scheduling ios notifications.");
+    isSessionEnded = false;
+    var freqStr = studySet.frequency;
+    var durStr = studySet.duration;
+    var nowDt = new DateTime.now();
+    var nowMilliseconds = nowDt.millisecondsSinceEpoch;
+    int duration;
+    double frequency;
 
-    var now = new DateTime.now();
-    var notificationTime = new DateTime(
-        now.year, now.month, now.day, now.hour, now.minute, now.second + 2);
-    notesList.forEach((note) {
-      notificationTime.add(Duration(minutes: 1));
-      scheduleNotification(flutterLocalNotificationsPlugin, note.id.toString(),
-          note.title, note.body, notificationTime);
-    });
+    if (durStr == '30 Mins') {
+      duration = 1000 * 60 * 30;
+    } else if (durStr == '1 Hr') {
+      duration = 1000 * 60 * 60;
+    } else if (durStr == '2 Hrs') {
+      duration = 1000 * 60 * 120;
+    }
+
+    if (freqStr == 'Very low') {
+      frequency = duration / 5;
+    } else if (freqStr == 'Low') {
+      frequency = duration / 10;
+    } else if (freqStr == 'Medium') {
+      frequency = duration / 15;
+    } else if (freqStr == 'High') {
+      frequency = duration / 20;
+    }
+
+    // TEST PURPOSES
+    duration = 1000 * 20;
+    frequency = (1000 * 2).toDouble();
+    //
+
+    // scheduleNotification(
+    //         flutterLocalNotificationsPlugin,
+    //         notesList[0].id.toString(),
+    //         notesList[0].title,
+    //         notesList[0].body,
+    //         notificationsDateTime.add(Duration(seconds: 5)))
+    //     .whenComplete(() {
+    //   print("Completed");
+    // }).catchError((error, stackTrace) {
+    //   print('error');
+    // });
+
+    DateTime notificationsDateTime = nowDt;
+    print(notificationsDateTime);
+    int notesListIndex = 0;
+    int scheduledNotificationCount = 1;
+
+    print(notesList[0]);
+    // scheduleNotification(
+    //         flutterLocalNotificationsPlugin,
+    //         notesList[0].id.toString(),
+    //         notesList[0].title,
+    //         notesList[0].body,
+    //         notificationsDateTime.add(Duration(milliseconds: 3000)))
+    //     .then((value) {
+    //   scheduleNotification(
+    //       flutterLocalNotificationsPlugin,
+    //       notesList[1].id.toString(),
+    //       notesList[1].title,
+    //       notesList[1].body,
+    //       notificationsDateTime.add(Duration(milliseconds: 6000)));
+    // });
+    print(notesList[1]);
+
+    // print('Notification scheduled.');
+    // while (notificationsDateTime
+    //             .add(Duration(
+    //                 milliseconds:
+    //                     frequency.toInt() * scheduledNotificationCount))
+    //             .millisecondsSinceEpoch <
+    //         nowDt
+    //             .add(Duration(milliseconds: duration))
+    //             .millisecondsSinceEpoch &&
+    //     !isSessionEnded) {
+    //   if (notesListIndex == notesList.length) {
+    //     // notesListIndex = 0;
+    //     break;
+    //   }
+
+    //   Note note = notesList[notesListIndex];
+    //   scheduleNotification(
+    //       flutterLocalNotificationsPlugin,
+    //       note.id.toString(),
+    //       note.title,
+    //       note.body,
+    //       notificationsDateTime.add(Duration(
+    //           milliseconds: frequency.toInt() * scheduledNotificationCount)));
+    //   notesListIndex++;
+    //   scheduledNotificationCount++;
+    //   print("Scheduled: ${note.title}");
+    // }
   }
 
   void _delete(BuildContext context, Note note) async {
@@ -206,10 +311,6 @@ class NotesPageState extends State<NotesPage> {
       // Failure
       _showSnackBar(context, 'Error deleting Note');
     }
-  }
-
-  void androidShowSnackBar(String message) {
-    _showSnackBar(context, message);
   }
 
   void _showSnackBar(BuildContext context, String message) {
@@ -234,13 +335,13 @@ class NotesPageState extends State<NotesPage> {
     bool result;
     if (note != null) {
       // Case 1: Update Operation
-      result = await Navigator.of(context)
-          .push(MaterialPageRoute(builder: (context) => new AddNotePage(note)));
+      result = await Navigator.of(context).push(MaterialPageRoute(
+          builder: (context) => new AddNotePage(note, studySet)));
     } else {
       // Case 2: Insert Operation
       result = await Navigator.of(context).push(MaterialPageRoute(
           builder: (context) =>
-              new AddNotePage(new Note(this.studySet.id, '', ''))));
+              new AddNotePage(new Note(this.studySet.id, '', ''), studySet)));
     }
 
     if (result == true) {
@@ -264,5 +365,10 @@ class NotesPageState extends State<NotesPage> {
   void openSettingsPage(StudySet studySet) {
     Navigator.of(context).push(
         MaterialPageRoute(builder: (context) => new SettingsPage(studySet)));
+  }
+
+  void stopNotifications() {
+    // turnOffNotifications(flutterLocalNotificationsPlugin);
+    _showSnackBar(context, "Stopped session and cancelled notifications.");
   }
 }

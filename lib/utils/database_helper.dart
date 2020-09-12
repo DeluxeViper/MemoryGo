@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
 import 'dart:async';
+import 'package:path/path.dart' as p;
 
 import '../model/Note.dart';
 import '../model/StudySet.dart';
@@ -32,6 +33,7 @@ class DatabaseHelper {
   factory DatabaseHelper() {
     if (_databaseHelper == null) {
       _databaseHelper = DatabaseHelper._createInstance();
+      print("Created database instance");
     }
     return _databaseHelper;
   }
@@ -45,7 +47,8 @@ class DatabaseHelper {
 
   Future<Database> initializeDatabase() async {
     Directory directory = await getApplicationDocumentsDirectory();
-    String path = directory.path + 'memoryGoDatabase.db';
+    // String path = directory.path + 'memoryGoDatabase.db';
+    String path = p.join(directory.toString(), 'memoryGoDatabase.db');
 
     // open/create database at path
     var memoryGoDatabase =

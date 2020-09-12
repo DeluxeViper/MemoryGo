@@ -2,18 +2,17 @@ import 'package:MemoryGo/constants.dart';
 import 'package:MemoryGo/screens/studyset_list.dart';
 import 'package:MemoryGo/utils/notification_helper.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+// import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
-final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-    FlutterLocalNotificationsPlugin();
-NotificationAppLaunchDetails notificationAppLaunchDetails;
-
-Future<void> main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  notificationAppLaunchDetails =
-      await flutterLocalNotificationsPlugin.getNotificationAppLaunchDetails();
-  await initNotifications(flutterLocalNotificationsPlugin);
-  requestIOSPermissions(flutterLocalNotificationsPlugin);
+// final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+//     FlutterLocalNotificationsPlugin();
+// NotificationAppLaunchDetails notificationAppLaunchDetails;
+// WidgetsFlutterBinding.ensureInitialized();
+// notificationAppLaunchDetails =
+//     await flutterLocalNotificationsPlugin.getNotificationAppLaunchDetails();
+// await initNotifications(flutterLocalNotificationsPlugin);
+// requestIOSPermissions(flutterLocalNotificationsPlugin);
+void main() {
   runApp(MyApp());
 }
 

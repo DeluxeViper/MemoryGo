@@ -1,10 +1,11 @@
+import 'package:MemoryGo/constants.dart';
 import 'package:MemoryGo/utils/database_helper.dart';
 import 'package:MemoryGo/model/StudySet.dart';
 import 'package:MemoryGo/screens/settings_page.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:sqflite/sqflite.dart';
 
-import 'add_study_set_page.dart';
 import 'notes_page.dart';
 
 class StudySetList extends StatefulWidget {
@@ -18,6 +19,7 @@ class StudySetList extends StatefulWidget {
 
 class StudySetListState extends State<StudySetList> {
   static DatabaseHelper databaseHelper = DatabaseHelper();
+  TextEditingController nameOfSetController = new TextEditingController();
   static List<StudySet> studySets;
   int count = 0;
 
@@ -28,7 +30,6 @@ class StudySetListState extends State<StudySetList> {
       studySets = List<StudySet>();
       updateListView();
     }
-
     return Scaffold(
       appBar: appBar,
       body: Container(
@@ -39,17 +40,20 @@ class StudySetListState extends State<StudySetList> {
             // Title
             new Container(
                 margin: new EdgeInsets.only(top: 30.0, left: 10.0),
-                child: Text(
-                  'Study Sets',
-                  style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
-                )),
+                child: Padding(
+                    padding: EdgeInsets.only(left: 20),
+                    child: Text(
+                      'Study Sets',
+                      style:
+                          TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+                    ))),
             // Cards
             Expanded(child: getStudySetListView())
           ],
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => goToAddSetPage(),
+        onPressed: () => addStudySetModalBottomSheet(context),
         tooltip: 'Add Study Set',
         child: Icon(Icons.add),
       ),
@@ -59,6 +63,7 @@ class StudySetListState extends State<StudySetList> {
   // Displays studyset list
   ListView getStudySetListView() {
     return ListView.builder(
+        physics: BouncingScrollPhysics(),
         itemCount: studySets.length,
         itemBuilder: (BuildContext context, int index) {
           return Container(
@@ -106,7 +111,7 @@ class StudySetListState extends State<StudySetList> {
                                   new SizedBox(height: 10.0, width: 10.0),
                                   new GestureDetector(
                                       onTap: () {
-                                        _delete(context, studySets[index]);
+                                        showAlertDialog(context, index);
                                       },
                                       child: Icon(Icons.delete,
                                           semanticLabel: 'Delete Study set'))
@@ -114,6 +119,99 @@ class StudySetListState extends State<StudySetList> {
                               ))
                         ],
                       ))));
+        });
+  }
+
+  void addStudySetModalBottomSheet(BuildContext context) {
+    showModalBottomSheet(
+        isDismissible: true,
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(20), topRight: Radius.circular(20))),
+        context: context,
+        builder: (BuildContext context) {
+          return new Container(
+              height: 150,
+              child: new Column(
+                children: <Widget>[
+                  // Title of Study Set
+                  new Padding(
+                      padding: EdgeInsets.all(10),
+                      child: new TextField(
+                          autocorrect: false,
+                          controller: nameOfSetController,
+                          decoration: InputDecoration(
+                              border: OutlineInputBorder(),
+                              labelText: 'Study Set Name'),
+                          onSubmitted: (value) {
+                            print("submitted");
+                            _addSet();
+                            nameOfSetController.clear();
+                          })),
+                  new RaisedButton(
+                    onPressed: () {
+                      _addSet();
+                      nameOfSetController.clear();
+                    },
+                    color: kPrimaryColor,
+                    child: Text("Add Study Set"),
+                  ),
+                ],
+              ));
+        });
+  }
+
+  void _addSet() async {
+    print('Adding set');
+    StudySet studySet = new StudySet('', 0);
+    int result;
+    studySet.title = nameOfSetController.text;
+    if (studySet.id != null) {
+      // Case 1: Update Operation -> Studyset exists
+      result = await databaseHelper.updateStudySet(studySet);
+    } else {
+      result = await databaseHelper.insertStudySet(studySet);
+    }
+
+    if (result != 0) {
+      // Success
+      print('Studyset saved Successfully.');
+      updateListView();
+      // _showAlertDialog('Status', 'Studyset saved Successfully.');
+    } else {
+      // Failure
+      print('Problem saving Studyset.');
+      // _showAlertDialog('Status', 'Problem saving Studyset.');
+    }
+
+    // Update list with studyset and return back to the page
+    Navigator.pop(context, true);
+  }
+
+  showAlertDialog(BuildContext context, int index) {
+    AlertDialog alert = new AlertDialog(
+      title: Text("Delete Study Set"),
+      content: Text("Are you sure you want to delete this study set?"),
+      actions: [
+        FlatButton(
+            child: Text("Yes"),
+            color: Colors.green,
+            onPressed: () {
+              _delete(context, studySets[index]);
+              Navigator.of(context).pop();
+            }),
+        FlatButton(
+            color: Colors.red,
+            child: Text("No"),
+            onPressed: () => Navigator.of(context).pop())
+      ],
+      elevation: 20.0,
+    );
+
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return alert;
         });
   }
 
@@ -152,15 +250,18 @@ class StudySetListState extends State<StudySetList> {
         MaterialPageRoute(builder: (context) => new SettingsPage(studySet)));
   }
 
-  void goToAddSetPage() async {
-    bool result = await Navigator.of(context).push(MaterialPageRoute(
-      builder: (context) => AddStudySet(),
-    ));
+  // void goToAddSetPage() async {
+  //   // bool result = await Navigator.of(context).push(MaterialPageRoute(
+  //   //   builder: (context) => AddStudySet(),
+  //   // ));
 
-    if (result == true) {
-      updateListView();
-    }
-  }
+  //   bool result = addStudySetModalBottomSheet(context);
+  //   print("Add study set or not? $result");
+
+  //   if (result == true) {
+  //     updateListView();
+  //   }
+  // }
 
   void openNotesPage(StudySet studySet) async {
     int result = await Navigator.of(context).push(MaterialPageRoute(
