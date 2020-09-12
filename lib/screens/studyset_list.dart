@@ -19,7 +19,7 @@ class StudySetList extends StatefulWidget {
 
 class StudySetListState extends State<StudySetList> {
   static DatabaseHelper databaseHelper = DatabaseHelper();
-  TextEditingController nameOfSetController = new TextEditingController();
+  final TextEditingController nameOfSetController = new TextEditingController();
   static List<StudySet> studySets;
   int count = 0;
 
@@ -123,16 +123,21 @@ class StudySetListState extends State<StudySetList> {
   }
 
   void addStudySetModalBottomSheet(BuildContext context) {
+    nameOfSetController.text = '';
     showModalBottomSheet(
+        enableDrag: true,
+        isScrollControlled: true,
         isDismissible: true,
         shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.only(
                 topLeft: Radius.circular(20), topRight: Radius.circular(20))),
         context: context,
         builder: (BuildContext context) {
-          return new Container(
-              height: 150,
-              child: new Column(
+          return new Padding(
+              padding: EdgeInsets.only(
+                  bottom: MediaQuery.of(context).viewInsets.bottom),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
                   // Title of Study Set
                   new Padding(
@@ -146,12 +151,12 @@ class StudySetListState extends State<StudySetList> {
                           onSubmitted: (value) {
                             print("submitted");
                             _addSet();
-                            nameOfSetController.clear();
+                            nameOfSetController.text = '';
                           })),
                   new RaisedButton(
                     onPressed: () {
                       _addSet();
-                      nameOfSetController.clear();
+                      nameOfSetController.text = '';
                     },
                     color: kPrimaryColor,
                     child: Text("Add Study Set"),
