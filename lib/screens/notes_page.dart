@@ -6,11 +6,8 @@ import 'package:MemoryGo/model/Note.dart';
 import 'package:MemoryGo/model/StudySet.dart';
 import 'package:MemoryGo/screens/add_note_page.dart';
 import 'package:MemoryGo/screens/settings_page.dart';
-import 'package:MemoryGo/utils/notification_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:MemoryGo/main.dart';
-// import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:sqflite/sqflite.dart';
 
 import 'add_note_page.dart';
@@ -79,11 +76,8 @@ class NotesPageState extends State<NotesPage> {
                             _showSnackBar(context,
                                 "Error, Cannot start. ${studySet.title} is Empty.");
                           } else {
-                            print("pressed");
                             openNoteBubble(notesList);
                           }
-                        } else if (Platform.isIOS) {
-                          scheduleIOSNotifications(notesList);
                         } else {
                           _showSnackBar(context, "Platform unrecognized.");
                         }
@@ -181,7 +175,8 @@ class NotesPageState extends State<NotesPage> {
         "studySetTitle": studySet.title,
         "frequency": studySet.frequency,
         "repeat": studySet.repeat.toString(),
-        "overwrite": studySet.overwrite.toString()
+        "overwrite": studySet.overwrite.toString(),
+        "shuffle": studySet.shuffle.toString()
       }).whenComplete(() {
         isSessionEnded = true;
         print("Note bubble completed.");
@@ -189,102 +184,6 @@ class NotesPageState extends State<NotesPage> {
     } catch (e) {
       print(e);
     }
-  }
-
-  void scheduleIOSNotifications(List<Note> notesList) async {
-    print("Scheduling ios notifications.");
-    isSessionEnded = false;
-    var freqStr = studySet.frequency;
-    var durStr = studySet.duration;
-    var nowDt = new DateTime.now();
-    var nowMilliseconds = nowDt.millisecondsSinceEpoch;
-    int duration;
-    double frequency;
-
-    if (durStr == '30 Mins') {
-      duration = 1000 * 60 * 30;
-    } else if (durStr == '1 Hr') {
-      duration = 1000 * 60 * 60;
-    } else if (durStr == '2 Hrs') {
-      duration = 1000 * 60 * 120;
-    }
-
-    if (freqStr == 'Very low') {
-      frequency = duration / 5;
-    } else if (freqStr == 'Low') {
-      frequency = duration / 10;
-    } else if (freqStr == 'Medium') {
-      frequency = duration / 15;
-    } else if (freqStr == 'High') {
-      frequency = duration / 20;
-    }
-
-    // TEST PURPOSES
-    duration = 1000 * 20;
-    frequency = (1000 * 2).toDouble();
-    //
-
-    // scheduleNotification(
-    //         flutterLocalNotificationsPlugin,
-    //         notesList[0].id.toString(),
-    //         notesList[0].title,
-    //         notesList[0].body,
-    //         notificationsDateTime.add(Duration(seconds: 5)))
-    //     .whenComplete(() {
-    //   print("Completed");
-    // }).catchError((error, stackTrace) {
-    //   print('error');
-    // });
-
-    DateTime notificationsDateTime = nowDt;
-    print(notificationsDateTime);
-    int notesListIndex = 0;
-    int scheduledNotificationCount = 1;
-
-    print(notesList[0]);
-    // scheduleNotification(
-    //         flutterLocalNotificationsPlugin,
-    //         notesList[0].id.toString(),
-    //         notesList[0].title,
-    //         notesList[0].body,
-    //         notificationsDateTime.add(Duration(milliseconds: 3000)))
-    //     .then((value) {
-    //   scheduleNotification(
-    //       flutterLocalNotificationsPlugin,
-    //       notesList[1].id.toString(),
-    //       notesList[1].title,
-    //       notesList[1].body,
-    //       notificationsDateTime.add(Duration(milliseconds: 6000)));
-    // });
-    print(notesList[1]);
-
-    // print('Notification scheduled.');
-    // while (notificationsDateTime
-    //             .add(Duration(
-    //                 milliseconds:
-    //                     frequency.toInt() * scheduledNotificationCount))
-    //             .millisecondsSinceEpoch <
-    //         nowDt
-    //             .add(Duration(milliseconds: duration))
-    //             .millisecondsSinceEpoch &&
-    //     !isSessionEnded) {
-    //   if (notesListIndex == notesList.length) {
-    //     // notesListIndex = 0;
-    //     break;
-    //   }
-
-    //   Note note = notesList[notesListIndex];
-    //   scheduleNotification(
-    //       flutterLocalNotificationsPlugin,
-    //       note.id.toString(),
-    //       note.title,
-    //       note.body,
-    //       notificationsDateTime.add(Duration(
-    //           milliseconds: frequency.toInt() * scheduledNotificationCount)));
-    //   notesListIndex++;
-    //   scheduledNotificationCount++;
-    //   print("Scheduled: ${note.title}");
-    // }
   }
 
   void _delete(BuildContext context, Note note) async {

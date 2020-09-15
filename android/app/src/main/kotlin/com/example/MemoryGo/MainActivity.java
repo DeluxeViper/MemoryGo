@@ -69,7 +69,7 @@ public class MainActivity extends FlutterActivity {
     private String studySetTitle, durationStr, freqStr;
     private long duration, frequency;
     private int currentNoteIndex = 0;
-    private boolean sessionEnded, repeat, bubbleRemoved, overwrite;
+    private boolean sessionEnded, repeat, bubbleRemoved, overwrite, shuffle;
     private MethodChannel.Result methodResult;
     private MemoryGoTimer timer;
 
@@ -127,6 +127,15 @@ public class MainActivity extends FlutterActivity {
                     } else {
                         throw new Error("Error. Unrecognizable Setting parameter: Overwrite");
                     }
+                    
+                    String shuffleStr = call.argument("shuffle");
+                    if (shuffleStr.toLowerCase().equals("false")){
+                        shuffle = false;
+                    } else if (shuffleStr.toLowerCase().equals("true")){
+                        shuffle = true;
+                    } else {
+                        throw new Error("Error. Unrecognizable Setting parameter: Shuffle.");
+                    }
 
                     if (durationStr.equals("30 Mins")) {
                         duration = 1000 * 60 * 30;
@@ -150,7 +159,7 @@ public class MainActivity extends FlutterActivity {
                         throw new Error("Error. Unrecognizable Setting parameter: Frequency");
                     }
 
-                    Log.d(TAG, "onMethodCall: frequency: " + frequency + ", " + overwrite + ", " + repeat);
+                    Log.d(TAG, "onMethodCall: frequency: " + frequency + ", " + overwrite + ", " + repeat + ", shuffle: " + shuffle);
                     Log.d(TAG, "onMethodCall: notesList: " + notesListMap);
                     initializeNotesList(notesListMap);
                     initializeBubblesManager();

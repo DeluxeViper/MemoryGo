@@ -22,7 +22,8 @@ class SettingsPageState extends State<SettingsPage> {
       medChecked,
       highChecked,
       repeatVal,
-      overwriteVal;
+      overwriteVal,
+      shuffleVal;
 
   StudySet studySet;
 
@@ -51,6 +52,7 @@ class SettingsPageState extends State<SettingsPage> {
     }
     repeatVal = studySet.repeat;
     overwriteVal = studySet.overwrite;
+    shuffleVal = studySet.shuffle;
   }
 
   @override
@@ -197,6 +199,24 @@ class SettingsPageState extends State<SettingsPage> {
               )
             ],
           ),
+          // Shuffle
+          new Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Padding(
+                  padding: EdgeInsets.only(left: 10.0),
+                  child: Text('Shuffle',
+                      style: TextStyle(fontWeight: FontWeight.bold))),
+              Switch(
+                onChanged: (value) {
+                  setState(() {
+                    shuffleVal = value;
+                  });
+                },
+                value: shuffleVal,
+              )
+            ],
+          ),
           // Save Button
           new Row(mainAxisAlignment: MainAxisAlignment.center, children: [
             RaisedButton(
@@ -235,6 +255,9 @@ class SettingsPageState extends State<SettingsPage> {
     // Overwrite of study set
     studySet.overwrite = overwriteVal;
 
+    // Shuffle of study set
+    studySet.shuffle = shuffleVal;
+
     _updateSet(studySet);
 
     Navigator.pop(context);
@@ -245,10 +268,10 @@ class SettingsPageState extends State<SettingsPage> {
 
     if (result != 0) {
       // Successfully saved settings
-      var studySetList = await helper.getStudySetList();
-      print(studySetList.toString());
+      print('Successfully saved settings');
     } else {
       // Failed to save settings
+      print('Failed to save settings');
     }
   }
 }

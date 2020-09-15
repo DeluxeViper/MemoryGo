@@ -15,6 +15,7 @@ class StudySet {
   String _frequency;
   bool _repeat;
   bool _overwrite;
+  bool _shuffle;
 
   StudySet(this._title, this._numCards) {
     _date = getCurrentDate();
@@ -24,6 +25,7 @@ class StudySet {
     _frequency = freqList[2];
     _repeat = false;
     _overwrite = false;
+    _shuffle = false;
   }
 
   StudySet.withId(this._id, this._title, this._numCards) {
@@ -45,6 +47,8 @@ class StudySet {
   bool get repeat => _repeat;
 
   bool get overwrite => _overwrite;
+
+  bool get shuffle => _shuffle;
 
   set title(String newTitle) {
     this._title = newTitle;
@@ -70,6 +74,10 @@ class StudySet {
     this._overwrite = newOverwrite;
   }
 
+  set shuffle(bool newShuffle) {
+    this._shuffle = newShuffle;
+  }
+
   // Convert a StudySet object into a Map object
   Map<String, dynamic> setToMap() {
     var studySetMap = Map<String, dynamic>();
@@ -85,6 +93,7 @@ class StudySet {
     studySetMap['frequency'] = _frequency;
     studySetMap['repeat'] = _repeat.toString();
     studySetMap['overwrite'] = _overwrite.toString();
+    studySetMap['shuffle'] = _shuffle.toString();
 
     return studySetMap;
   }
@@ -109,6 +118,12 @@ class StudySet {
     } else {
       this._overwrite = false;
     }
+
+    if (map['shuffle'] == 'true') {
+      this._shuffle = true;
+    } else {
+      this._shuffle = false;
+    }
   }
 
   // Retrieve current date & time and format it
@@ -122,6 +137,6 @@ class StudySet {
   }
 
   String toString() {
-    return 'id: ${this._id}, title: ${this._title}, date: ${this._date}, numCards: ${this._numCards}, duration: ${this._duration}, frequency: ${this._frequency}, repeat: ${this._repeat}, overwrite: ${this.overwrite}';
+    return 'id: ${this._id}, title: ${this._title}, date: ${this._date}, numCards: ${this._numCards}, duration: ${this._duration}, frequency: ${this._frequency}, repeat: ${this._repeat}, overwrite: ${this._overwrite}, shuffle: ${this._shuffle}';
   }
 }
