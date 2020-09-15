@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- Theme applied to the Android Window while the process is starting -->
-    <style name="LaunchTheme" parent="@android:style/Theme.Black.NoTitleBar">
+    <style name="LaunchTheme" parent="Theme.MaterialComponents">
         <!-- Show a splash screen on the activity. Automatically removed when
              Flutter draws its first frame -->
         <item name="android:windowBackground">@drawable/launch_background</item>
@@ -12,7 +12,13 @@
          running.
          
          This Theme is only used starting with V2 of Flutter's Android embedding. -->
-    <style name="NormalTheme" parent="@android:style/Theme.Black.NoTitleBar">
+    <style name="NormalTheme" parent="Theme.MaterialComponents">
         <item name="android:windowBackground">@android:color/white</item>
+    </style>
+
+    <style name="AppTheme" parent="Theme.MaterialComponents">
+        <item name="colorPrimary">@android:color/primary_text_light</item>
+        <item name="colorPrimaryDark">@android:color/primary_text_dark</item>
+        <item name="colorAccent">@android:color/holo_blue_light</item>
     </style>
 </resources>

@@ -79,6 +79,7 @@ class NotesPageState extends State<NotesPage> {
                             _showSnackBar(context,
                                 "Error, Cannot start. ${studySet.title} is Empty.");
                           } else {
+                            print("pressed");
                             openNoteBubble(notesList);
                           }
                         } else if (Platform.isIOS) {
@@ -93,24 +94,6 @@ class NotesPageState extends State<NotesPage> {
                           padding: EdgeInsets.only(top: 10, bottom: 10),
                           child: Text('Go')),
                     ),
-                    // Stop Session
-                    RaisedButton(
-                      onPressed: () {
-                        // Stop Session
-                        if (isSessionEnded == true) {
-                          _showSnackBar(
-                              context, "Error. Session is already running.");
-                        } else {
-                          isSessionEnded = true;
-                          stopNotifications();
-                        }
-                      },
-                      color: Color(0xFFFF0000),
-                      textColor: Colors.white,
-                      child: Padding(
-                          padding: EdgeInsets.only(top: 10, bottom: 10),
-                          child: Text('Stop Session')),
-                    )
                   ],
                 )),
             Expanded(child: getNoteListView())
@@ -189,7 +172,7 @@ class NotesPageState extends State<NotesPage> {
     notesList.forEach((note) {
       notesListMap.add(note.noteToMap());
     });
-
+    isSessionEnded = false;
     // Starting note bubble service in Android
     try {
       await androidPlatform.invokeMethod('openNoteBubble', {
@@ -199,6 +182,9 @@ class NotesPageState extends State<NotesPage> {
         "frequency": studySet.frequency,
         "repeat": studySet.repeat.toString(),
         "overwrite": studySet.overwrite.toString()
+      }).whenComplete(() {
+        isSessionEnded = true;
+        print("Note bubble completed.");
       });
     } catch (e) {
       print(e);
@@ -306,6 +292,8 @@ class NotesPageState extends State<NotesPage> {
     if (result != 0) {
       // Success
       _showSnackBar(context, 'Note deleted Successfully');
+      studySet.numCards--;
+      helper.updateStudySet(widget.studySet);
       updateNoteListView();
     } else {
       // Failure
@@ -326,6 +314,7 @@ class NotesPageState extends State<NotesPage> {
         setState(() {
           this.notesList = noteList;
           this.count = noteList.length;
+          this.studySet.numCards = notesList.length;
         });
       });
     });
@@ -365,10 +354,5 @@ class NotesPageState extends State<NotesPage> {
   void openSettingsPage(StudySet studySet) {
     Navigator.of(context).push(
         MaterialPageRoute(builder: (context) => new SettingsPage(studySet)));
-  }
-
-  void stopNotifications() {
-    // turnOffNotifications(flutterLocalNotificationsPlugin);
-    _showSnackBar(context, "Stopped session and cancelled notifications.");
   }
 }

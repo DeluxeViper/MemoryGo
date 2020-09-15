@@ -1,35 +1,45 @@
 package com.example.MemoryGo;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
 import android.provider.Settings;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.MemoryGo.adapters.BubbleAdapter;
 import com.example.MemoryGo.model.Note;
+import com.google.android.material.button.MaterialButton;
+import com.google.android.material.snackbar.Snackbar;
 import com.nex3z.notificationbadge.NotificationBadge;
 import com.txusballesteros.bubbles.BubbleLayout;
 import com.txusballesteros.bubbles.BubblesManager;
 import com.txusballesteros.bubbles.OnInitializedCallback;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Timer;
 import java.util.TimerTask;
 
 import io.flutter.embedding.android.FlutterActivity;
@@ -48,6 +58,7 @@ public class MainActivity extends FlutterActivity {
     private BubblesManager bubblesManager;
     private BubbleLayout bubbleView;
     private RecyclerView notesRecView;
+    private MaterialButton stopButton;
     private BubbleAdapter mAdapter;
 
     private View noteBubbleDrownDown;
@@ -59,6 +70,8 @@ public class MainActivity extends FlutterActivity {
     private long duration, frequency;
     private int currentNoteIndex = 0;
     private boolean sessionEnded, repeat, bubbleRemoved, overwrite;
+    private MethodChannel.Result methodResult;
+    private MemoryGoTimer timer;
 
     @Override
     public void configureFlutterEngine(@NonNull FlutterEngine flutterEngine) {
@@ -66,14 +79,32 @@ public class MainActivity extends FlutterActivity {
         GeneratedPluginRegistrant.registerWith(flutterEngine);
     }
 
+    // Session ended -> Remove Bubble -> Press Go -> Service not registered error (bubblesManager)
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
+        sessionEnded = false;
+        timer = new MemoryGoTimer(false);
+
         super.onCreate(savedInstanceState);
         new MethodChannel(Objects.requireNonNull(getFlutterEngine()).getDartExecutor().getBinaryMessenger(), CHANNEL).setMethodCallHandler(new MethodChannel.MethodCallHandler() {
             @RequiresApi(api = Build.VERSION_CODES.M)
             @Override
             public void onMethodCall(@NonNull MethodCall call, @NonNull MethodChannel.Result result) {
                 if (call.method.equals("openNoteBubble")) {
+                    // If statement purpose: If session has ended and bubble has not been removed, then you can start another cycle by pressing go.
+                    // Also: If session has ended and bubble has been removed, then you can start another cycle by pressing go.
+                    if (sessionEnded && !bubbleRemoved) {
+                        bubblesManager.recycle();
+                        sessionEnded = false;
+                    } else if (!sessionEnded && timer.isRunning()) {
+                        // To make sure that when you press go and session is not ended, that it doesn't let allow it to go through.
+                        Toast.makeText(getContext(), "Session is already running", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+
+                    methodResult = result;
+
+                    // Initializing variables
                     List<Map<String, String>> notesListMap = call.argument("notesListMap");
                     studySetTitle = call.argument("studySetTitle");
                     durationStr = call.argument("duration");
@@ -89,9 +120,9 @@ public class MainActivity extends FlutterActivity {
                     }
 
                     String overwriteStr = call.argument("overwrite");
-                    if (overwriteStr.toLowerCase().equals("false")){
+                    if (overwriteStr.toLowerCase().equals("false")) {
                         overwrite = false;
-                    } else if (overwriteStr.toLowerCase().equals("true")){
+                    } else if (overwriteStr.toLowerCase().equals("true")) {
                         overwrite = true;
                     } else {
                         throw new Error("Error. Unrecognizable Setting parameter: Overwrite");
@@ -119,11 +150,10 @@ public class MainActivity extends FlutterActivity {
                         throw new Error("Error. Unrecognizable Setting parameter: Frequency");
                     }
 
+                    Log.d(TAG, "onMethodCall: frequency: " + frequency + ", " + overwrite + ", " + repeat);
+                    Log.d(TAG, "onMethodCall: notesList: " + notesListMap);
                     initializeNotesList(notesListMap);
                     initializeBubblesManager();
-
-                    result.success("Opening note bubble service.");
-                    Log.d(TAG, "onMethodCall: Frequency: " + frequency + ", Duration: " + duration);
                 }
             }
         });
@@ -141,9 +171,9 @@ public class MainActivity extends FlutterActivity {
             }
 
             // If repeat is true then let the timer keep going until duration is reached
-            if (repeat){
+            if (repeat) {
                 // If shuffle is false
-                if (currentNoteIndex >= notesList.size()){
+                if (currentNoteIndex >= notesList.size()) {
                     currentNoteIndex = 0;
                 }
             }
@@ -154,15 +184,21 @@ public class MainActivity extends FlutterActivity {
 
                 badge.setNumber(unreadNotesList.size());
                 if (currentNoteIndex == notesList.size() - 1 && !repeat) {
-                    unreadNotesList.add(new Note("Session Ended.", ""));
-                    sessionEnded = true;
+                    stopSession();
                 }
             } else {
+                if (noteBubbleDrownDown.getVisibility() == View.GONE) {
+                    if (badge.getTextView().toString().equals("1")) {
+                        badge.setNumber(0);
+                        badge.setNumber(1);
+                    } else {
+                        badge.setNumber(1);
+                    }
+                }
                 ArrayList<Note> currentNote = new ArrayList<>();
                 currentNote.add(notesList.get(currentNoteIndex));
                 if (currentNoteIndex == notesList.size() - 1 && !repeat) {
-                    currentNote.add(new Note("Session Ended.", ""));
-                    sessionEnded = true;
+                    stopSession();
                 }
                 mAdapter.setNotes(currentNote);
                 mAdapter.notifyDataSetChanged();
@@ -173,8 +209,15 @@ public class MainActivity extends FlutterActivity {
 
     // Starting timer with a fixed duration and frequency
     protected void startTimer() {
-        MemoryGoTimer timer = new MemoryGoTimer(false);
+        Log.d(TAG, "startTimer: starting timer");
+        addNewBubble();
+        timer = new MemoryGoTimer(false);
         timer.start();
+
+        // Testing purposes
+        duration = 20000;
+        frequency = 4000;
+
         timer.scheduleAtFixedRate(new TimerTask() {
             @RequiresApi(api = Build.VERSION_CODES.O)
             @Override
@@ -182,17 +225,14 @@ public class MainActivity extends FlutterActivity {
                 // If repeat is off
                 if (!repeat) {
                     if (currentNoteIndex >= notesList.size() || timer.getElapsedTime() >= duration) {
-                        currentNoteIndex = notesList.size() - 1; // might not need this line?
-                        timer.cancel();
-                        sessionEnded = true;
+                        stopSession();
                     } else {
                         timerHandler.obtainMessage().sendToTarget();
                     }
                 } else {
                     // Repeat is on
                     if (timer.getElapsedTime() >= duration) {
-                        timer.cancel();
-                        sessionEnded = true;
+                        stopSession();
                     } else {
                         timerHandler.obtainMessage().sendToTarget();
                     }
@@ -202,6 +242,24 @@ public class MainActivity extends FlutterActivity {
         }, frequency, frequency);
     }
 
+    public void stopSession() {
+        new Handler(Looper.getMainLooper()).post(new Runnable() {
+            @RequiresApi(api = Build.VERSION_CODES.O)
+            @Override
+            public void run() {
+                if (!mAdapter.getNotes().get(mAdapter.getNotes().size() - 1).getTitle().equals("Session Ended.")) {
+                    mAdapter.addNote(new Note("Session Ended.", ""));
+                }
+                sessionEnded = true;
+                timer.cancel();
+                Log.d(TAG, "run: Posted Success.");
+                sessionEnded = true;
+                stopButton.setVisibility(View.GONE);
+                methodResult.success("Session Success");
+            }
+        });
+    }
+
     private void initializeNotesList(List<Map<String, String>> notesListMap) {
         notesList = new ArrayList<Note>();
         unreadNotesList = new ArrayList<Note>();
@@ -209,28 +267,29 @@ public class MainActivity extends FlutterActivity {
         for (Map<String, String> noteMap : notesListMap) {
             notesList.add(new Note(noteMap));
         }
-//        Log.d(TAG, "initializeNotesList: notesList: " + notesList);
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.M)
     private void initializeBubblesManager() {
-        bubblesManager = new BubblesManager.Builder(this)
-                .setTrashLayout(R.layout.bubble_trash_layout)
-                .setInitializationCallback(new OnInitializedCallback() {
-                    @RequiresApi(api = Build.VERSION_CODES.M)
-                    @Override
-                    public void onInitialized() {
-                        if (!Settings.canDrawOverlays(MainActivity.this)) {
-                            Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
-                                    Uri.parse("package:" + getPackageName()));
-                            startActivityForResult(intent, ACTION_MANAGE_OVERLAY_PERMISSION_REQUEST);
-                        } else {
-                            addNewBubble();
+        currentNoteIndex = 0;
+        if (!Settings.canDrawOverlays(MainActivity.this)) {
+            Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                    Uri.parse("package:" + getPackageName()));
+            startActivityForResult(intent, ACTION_MANAGE_OVERLAY_PERMISSION_REQUEST);
+        } else {
+            bubblesManager = new BubblesManager.Builder(this)
+                    .setTrashLayout(R.layout.bubble_trash_layout)
+                    .setInitializationCallback(new OnInitializedCallback() {
+                        @RequiresApi(api = Build.VERSION_CODES.M)
+                        @Override
+                        public void onInitialized() {
                             startTimer();
                         }
-                    }
-                })
-                .build();
-        bubblesManager.initialize();
+                    })
+                    .build();
+            bubblesManager.initialize();
+        }
+
     }
 
     private void addNewBubble() {
@@ -240,6 +299,9 @@ public class MainActivity extends FlutterActivity {
             @Override
             public void onBubbleRemoved(BubbleLayout bubble) {
                 bubbleRemoved = true;
+                if (sessionEnded) {
+                    bubblesManager.recycle();
+                }
             }
         });
         bubbleView.setOnBubbleClickListener(new BubbleLayout.OnBubbleClickListener() {
@@ -250,12 +312,13 @@ public class MainActivity extends FlutterActivity {
             }
         });
         bubbleView.setShouldStickToWall(true);
-        bubblesManager.addBubble(bubbleView, 60, 20);
+        bubblesManager.addBubble(bubbleView, 20, 20);
         sessionEnded = false;
     }
 
     private void initializeViews() {
         bubbleView = (BubbleLayout) LayoutInflater.from(MainActivity.this).inflate(R.layout.bubble_layout, null);
+        stopButton = bubbleView.findViewById(R.id.stopButton);
         noteBubbleDrownDown = bubbleView.findViewById(R.id.note_bubble_dropdown_layout);
         studySetTitleTv = bubbleView.findViewById(R.id.study_set_title);
         studySetTitleTv.setText("Notes of " + studySetTitle);
@@ -269,15 +332,30 @@ public class MainActivity extends FlutterActivity {
 
         notesRecView.setAdapter(mAdapter);
         notesRecView.setLayoutManager(new LinearLayoutManager(this));
+
+        stopButton.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                stopSession();
+            }
+        });
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     private void onNoteBubbleClick() {
         if (isViewCollapsed()) {
             if (unreadNotesList.size() == 0) {
+                badge.setNumber(0); // This might seem redundant, but it is for if overwrite is false and the one notification that gets added
                 ArrayList<Note> currentNote = new ArrayList<>();
                 if (sessionEnded) {
-                    currentNote.add(notesList.get(notesList.size() - 1));
+                    if (currentNoteIndex >= 1) {
+                        // This if statement is due to the currentNoteIndex++ in the timer that causes the noteindex to be 1 more than it is
+                        currentNote.add(notesList.get(currentNoteIndex - 1));
+                    } else {
+                        // If currentNoteIndex = 0, then let it stay at 0
+                        currentNote.add(notesList.get(currentNoteIndex));
+                    }
                     currentNote.add(new Note("Session Ended.", ""));
                 } else {
                     Note note = new Note(notesList.get(currentNoteIndex).getTitle(), notesList.get(currentNoteIndex).getBody());
@@ -304,18 +382,31 @@ public class MainActivity extends FlutterActivity {
         return noteBubbleDrownDown.getVisibility() == View.GONE;
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == ACTION_MANAGE_OVERLAY_PERMISSION_REQUEST) {
-            addNewBubble();
-            startTimer();
-
+            if (!Settings.canDrawOverlays(this)) {
+                Toast.makeText(getContext(), "Permission not granted.", Toast.LENGTH_SHORT).show();
+            } else {
+                bubblesManager = new BubblesManager.Builder(this)
+                        .setTrashLayout(R.layout.bubble_trash_layout)
+                        .setInitializationCallback(new OnInitializedCallback() {
+                            @RequiresApi(api = Build.VERSION_CODES.M)
+                            @Override
+                            public void onInitialized() {
+                                startTimer();
+                            }
+                        })
+                        .build();
+                bubblesManager.initialize();
+            }
         }
     }
 
     @Override
     protected void onDestroy() {
-        super.onDestroy();
         bubblesManager.recycle();
+        super.onDestroy();
     }
 }

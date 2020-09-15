@@ -57,6 +57,10 @@ public class BubbleAdapter extends RecyclerView.Adapter<BubbleAdapter.NoteViewHo
         this.notifyDataSetChanged();
     }
 
+    public ArrayList<Note> getNotes() {
+        return notes;
+    }
+
     public static class NoteViewHolder extends RecyclerView.ViewHolder {
 
         private TextView noteTitleTv, noteBodyTv;

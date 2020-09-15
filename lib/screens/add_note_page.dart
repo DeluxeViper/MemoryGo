@@ -1,9 +1,11 @@
 import 'dart:ui';
 
+import 'package:MemoryGo/constants.dart';
 import 'package:MemoryGo/model/StudySet.dart';
 import 'package:MemoryGo/utils/database_helper.dart';
 import 'package:MemoryGo/model/Note.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class AddNotePage extends StatefulWidget {
   final Note note;
@@ -18,7 +20,7 @@ class AddNotePage extends StatefulWidget {
 class AddNotePageState extends State<AddNotePage> {
   DatabaseHelper helper = DatabaseHelper();
   Note note;
-  FocusNode focusNode;
+  FocusNode noteBodyFocusNode;
   TextEditingController noteNameController;
   TextEditingController noteBodyController;
   bool isChanged = false;
@@ -33,12 +35,14 @@ class AddNotePageState extends State<AddNotePage> {
   @override
   void initState() {
     super.initState();
-    focusNode = new FocusNode();
+    noteBodyFocusNode = new FocusNode();
   }
 
   @override
   void dispose() {
-    focusNode.dispose();
+    noteBodyFocusNode.dispose();
+    // noteNameController.dispose();
+    // noteBodyController.dispose();
     super.dispose();
   }
 
@@ -81,14 +85,17 @@ class AddNotePageState extends State<AddNotePage> {
                           fontWeight: FontWeight.w700),
                       border: InputBorder.none,
                     ),
-                    onSubmitted: (value) => {focusNode.requestFocus()},
+                    onSubmitted: (value) {
+                      noteBodyFocusNode.requestFocus();
+                      print("title submitted");
+                    },
                   )),
-              //
+              // Note Body
               new Padding(
                   padding: EdgeInsets.all(10),
                   child: new TextField(
                     maxLines: null,
-                    focusNode: this.focusNode,
+                    focusNode: noteBodyFocusNode,
                     autocorrect: false,
                     controller: noteBodyController,
                     onChanged: (value) {
@@ -121,7 +128,7 @@ class AddNotePageState extends State<AddNotePage> {
             child: BackdropFilter(
               filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
               child: Container(
-                  height: 80,
+                  height: 90,
                   // color: Theme.of(context).canvasColor.withOpacity(0.3),
                   child: ConstrainedBox(
                     constraints: BoxConstraints(
@@ -132,11 +139,15 @@ class AddNotePageState extends State<AddNotePage> {
                           icon: Icon(Icons.arrow_back),
                           onPressed: () => {Navigator.pop(context)},
                         ),
-                        Text('Note of ' +
-                            (widget.studySet.title.length < 13
-                                ? widget.studySet.title
-                                : widget.studySet.title.substring(0, 13) +
-                                    '...')),
+                        Text(
+                          (widget.studySet.title.length < 15
+                              ? widget.studySet.title
+                              : widget.studySet.title.substring(0, 15) + '...'),
+                          style: TextStyle(
+                              fontSize: 23,
+                              fontWeight: FontWeight.bold,
+                              color: kPrimaryColor),
+                        ),
                         Spacer(),
                         IconButton(
                           icon: Icon(Icons.delete_outline),
@@ -163,7 +174,9 @@ class AddNotePageState extends State<AddNotePage> {
                                   'SAVE',
                                   style: TextStyle(letterSpacing: 1),
                                 ),
-                                onPressed: () => _addNote(),
+                                onPressed: () {
+                                  _addNote();
+                                },
                               ),
                             )),
                       ],
@@ -179,8 +192,12 @@ class AddNotePageState extends State<AddNotePage> {
   void _delete(BuildContext context, Note note) async {
     int result = await helper.deleteNote(note.id);
     if (result != 0) {
+      // Success
+      widget.studySet.numCards--;
+      helper.updateStudySet(widget.studySet);
       Navigator.pop(context, true);
     } else {
+      // Failure
       Navigator.pop(context, false);
     }
   }
@@ -194,6 +211,9 @@ class AddNotePageState extends State<AddNotePage> {
     // make sure the id gets passed into the note
     if (this.note.id == null) {
       note = Note(this.note.studySetId, noteTitle, noteBody);
+      // Update number of cards of studyset once added note
+      widget.studySet.numCards = widget.studySet.numCards++;
+      helper.updateStudySet(widget.studySet);
     } else {
       note =
           Note.withId(this.note.id, this.note.studySetId, noteTitle, noteBody);

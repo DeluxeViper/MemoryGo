@@ -166,8 +166,11 @@ class DatabaseHelper {
   Future<int> getNotesCountInSet(int studySetId) async {
     var db = await this.database;
     List<Map<String, dynamic>> x = await db.rawQuery(
-        'SELECT COUNT (*) from $notesTable WHERE $colStudySetId = $studySetId)');
+        'SELECT COUNT (*) from $notesTable WHERE $colStudySetId = $studySetId');
     int result = Sqflite.firstIntValue(x);
+    if (result == null) {
+      result = 0;
+    }
     return result;
   }
 

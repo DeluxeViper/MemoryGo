@@ -1,6 +1,10 @@
+import 'package:MemoryGo/utils/database_helper.dart';
+
 import '../constants.dart';
 
 class StudySet {
+  static DatabaseHelper databaseHelper = DatabaseHelper();
+
   int _id;
   String _title;
   String _date;

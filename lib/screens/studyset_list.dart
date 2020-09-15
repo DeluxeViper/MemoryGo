@@ -19,9 +19,21 @@ class StudySetList extends StatefulWidget {
 
 class StudySetListState extends State<StudySetList> {
   static DatabaseHelper databaseHelper = DatabaseHelper();
-  final TextEditingController nameOfSetController = new TextEditingController();
+  TextEditingController nameOfSetController;
   static List<StudySet> studySets;
   int count = 0;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    nameOfSetController = new TextEditingController();
+  }
+
+  void dispose() {
+    nameOfSetController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -254,19 +266,6 @@ class StudySetListState extends State<StudySetList> {
     Navigator.of(context).push(
         MaterialPageRoute(builder: (context) => new SettingsPage(studySet)));
   }
-
-  // void goToAddSetPage() async {
-  //   // bool result = await Navigator.of(context).push(MaterialPageRoute(
-  //   //   builder: (context) => AddStudySet(),
-  //   // ));
-
-  //   bool result = addStudySetModalBottomSheet(context);
-  //   print("Add study set or not? $result");
-
-  //   if (result == true) {
-  //     updateListView();
-  //   }
-  // }
 
   void openNotesPage(StudySet studySet) async {
     int result = await Navigator.of(context).push(MaterialPageRoute(

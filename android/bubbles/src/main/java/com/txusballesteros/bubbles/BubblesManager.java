@@ -93,6 +93,10 @@ public class BubblesManager {
         }
     }
 
+    public boolean isBounded() {
+        return bounded;
+    }
+
     public static class Builder {
         private BubblesManager bubblesManager;
 
