@@ -1,10 +1,7 @@
 package com.example.MemoryGo;
 
-import android.Manifest;
 import android.annotation.SuppressLint;
-import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -21,25 +18,22 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
-import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.MemoryGo.adapters.BubbleAdapter;
 import com.example.MemoryGo.model.Note;
 import com.google.android.material.button.MaterialButton;
-import com.google.android.material.snackbar.Snackbar;
 import com.nex3z.notificationbadge.NotificationBadge;
 import com.txusballesteros.bubbles.BubbleLayout;
 import com.txusballesteros.bubbles.BubblesManager;
 import com.txusballesteros.bubbles.OnInitializedCallback;
 
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Timer;
+import java.util.Random;
 import java.util.TimerTask;
 
 import io.flutter.embedding.android.FlutterActivity;
@@ -65,13 +59,15 @@ public class MainActivity extends FlutterActivity {
     private TextView studySetTitleTv;
     private NotificationBadge badge;
 
-    private ArrayList<Note> notesList, unreadNotesList;
+    private ArrayList<Note> notesList, unreadNotesList, shuffleReadList = new ArrayList<>();
     private String studySetTitle, durationStr, freqStr;
     private long duration, frequency;
-    private int currentNoteIndex = 0;
+    private int currentNoteIndex = 0, previousNoteIndex = 0;
     private boolean sessionEnded, repeat, bubbleRemoved, overwrite, shuffle;
     private MethodChannel.Result methodResult;
     private MemoryGoTimer timer;
+    private Random rand = new Random();
+
 
     @Override
     public void configureFlutterEngine(@NonNull FlutterEngine flutterEngine) {
@@ -79,7 +75,6 @@ public class MainActivity extends FlutterActivity {
         GeneratedPluginRegistrant.registerWith(flutterEngine);
     }
 
-    // Session ended -> Remove Bubble -> Press Go -> Service not registered error (bubblesManager)
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         sessionEnded = false;
@@ -127,11 +122,11 @@ public class MainActivity extends FlutterActivity {
                     } else {
                         throw new Error("Error. Unrecognizable Setting parameter: Overwrite");
                     }
-                    
+
                     String shuffleStr = call.argument("shuffle");
-                    if (shuffleStr.toLowerCase().equals("false")){
+                    if (shuffleStr.toLowerCase().equals("false")) {
                         shuffle = false;
-                    } else if (shuffleStr.toLowerCase().equals("true")){
+                    } else if (shuffleStr.toLowerCase().equals("true")) {
                         shuffle = true;
                     } else {
                         throw new Error("Error. Unrecognizable Setting parameter: Shuffle.");
@@ -159,7 +154,6 @@ public class MainActivity extends FlutterActivity {
                         throw new Error("Error. Unrecognizable Setting parameter: Frequency");
                     }
 
-                    Log.d(TAG, "onMethodCall: frequency: " + frequency + ", " + overwrite + ", " + repeat + ", shuffle: " + shuffle);
                     Log.d(TAG, "onMethodCall: notesList: " + notesListMap);
                     initializeNotesList(notesListMap);
                     initializeBubblesManager();
@@ -181,18 +175,39 @@ public class MainActivity extends FlutterActivity {
 
             // If repeat is true then let the timer keep going until duration is reached
             if (repeat) {
-                // If shuffle is false
-                if (currentNoteIndex >= notesList.size()) {
-                    currentNoteIndex = 0;
+                if (!shuffle) {
+                    // If shuffle is false and repeat is false
+                    if (currentNoteIndex >= notesList.size()) {
+                        currentNoteIndex = 0;
+                    }
+                } else {
+                    // Shuffle is true and repeat is true
+                    // Do nothing -> Will keep cycling through notes until duration has ended
+                    previousNoteIndex = currentNoteIndex;
                 }
+            } else {
+                // Repeat is false and shuffle is true -> Shuffle through cards, (does not go through the same card more than once) and ends when all notes are read
+                if (shuffle) {
+                    previousNoteIndex = currentNoteIndex;
+                    shuffleReadList.add(notesList.get(currentNoteIndex));
+                    if (shuffleReadList.containsAll(notesList)) {
+                        Log.d(TAG, "handleMessage: stopping session because all of the notes are read.");
+                        stopSession();
+                        return;
+                    }
+                }
+                // TODO: Implement logic is repeat is false and shuffle is false
             }
             // Overwrite logic needs double checking
             if (noteBubbleDrownDown.getVisibility() == View.GONE && overwrite) {
-                unreadNotesList.add(notesList.get(currentNoteIndex));
+                if (!unreadNotesList.contains(notesList.get(currentNoteIndex))) {
+                    unreadNotesList.add(notesList.get(currentNoteIndex));
+                }
                 Log.d(TAG, "handleMessage: unreadNotesList : " + unreadNotesList);
 
                 badge.setNumber(unreadNotesList.size());
-                if (currentNoteIndex == notesList.size() - 1 && !repeat) {
+                if (currentNoteIndex == notesList.size() - 1 && !repeat && !shuffle) {
+                    Log.d(TAG, "handleMessage: stopping session because last note is read and repeat is off. (overwrite is on)");
                     stopSession();
                 }
             } else {
@@ -206,18 +221,40 @@ public class MainActivity extends FlutterActivity {
                 }
                 ArrayList<Note> currentNote = new ArrayList<>();
                 currentNote.add(notesList.get(currentNoteIndex));
-                if (currentNoteIndex == notesList.size() - 1 && !repeat) {
+                if (currentNoteIndex == notesList.size() - 1 && !repeat && !shuffle) {
+                    Log.d(TAG, "handleMessage: stopping session because last note is read and repeat is off. (overwrite is off)");
                     stopSession();
                 }
                 mAdapter.setNotes(currentNote);
                 mAdapter.notifyDataSetChanged();
             }
-            currentNoteIndex++;
+
+            if (!shuffle) {
+                currentNoteIndex++;
+            } else {
+                if (!repeat) {
+                    int noteIndex;
+                    // If repeat is off and shuffle is on, then you cant go through the same note
+                    do {
+                        noteIndex = rand.nextInt(notesList.size());
+                    } while (shuffleReadList.contains(notesList.get(noteIndex)) && noteIndex != currentNoteIndex);
+                    currentNoteIndex = noteIndex;
+                } else {
+                    // Repeat is on and shuffle is on, then it runs for forever
+                    int noteIndex;
+                    do {
+                        noteIndex = rand.nextInt(notesList.size());
+                    } while (noteIndex == currentNoteIndex);
+                    currentNoteIndex = noteIndex;
+                }
+            }
         }
     };
 
     // Starting timer with a fixed duration and frequency
     protected void startTimer() {
+        rand = new Random();
+        shuffleReadList.clear();
         Log.d(TAG, "startTimer: starting timer");
         addNewBubble();
         timer = new MemoryGoTimer(false);
@@ -234,6 +271,7 @@ public class MainActivity extends FlutterActivity {
                 // If repeat is off
                 if (!repeat) {
                     if (currentNoteIndex >= notesList.size() || timer.getElapsedTime() >= duration) {
+                        Log.d(TAG, "run: stopping session because last note has been reached OR duration has been met. (repeat is off)");
                         stopSession();
                     } else {
                         timerHandler.obtainMessage().sendToTarget();
@@ -241,6 +279,7 @@ public class MainActivity extends FlutterActivity {
                 } else {
                     // Repeat is on
                     if (timer.getElapsedTime() >= duration) {
+                        Log.d(TAG, "run: stopping session because duration has been met. (repeat is on)");
                         stopSession();
                     } else {
                         timerHandler.obtainMessage().sendToTarget();
@@ -256,13 +295,15 @@ public class MainActivity extends FlutterActivity {
             @RequiresApi(api = Build.VERSION_CODES.O)
             @Override
             public void run() {
-                if (!mAdapter.getNotes().get(mAdapter.getNotes().size() - 1).getTitle().equals("Session Ended.")) {
+                if (mAdapter.getNotes().size() == 0) {
+                    mAdapter.addNote(new Note("Session Ended.", ""));
+                } else if (!mAdapter.getNotes().get(mAdapter.getNotes().size() - 1).getTitle().equals("Session Ended.")) {
+                    // Checking if the last note in adapter contains session ended, if it doesn't then add session ended
                     mAdapter.addNote(new Note("Session Ended.", ""));
                 }
                 sessionEnded = true;
                 timer.cancel();
                 Log.d(TAG, "run: Posted Success.");
-                sessionEnded = true;
                 stopButton.setVisibility(View.GONE);
                 methodResult.success("Session Success");
             }
@@ -343,7 +384,6 @@ public class MainActivity extends FlutterActivity {
         notesRecView.setLayoutManager(new LinearLayoutManager(this));
 
         stopButton.setOnClickListener(new View.OnClickListener() {
-
             @Override
             public void onClick(View v) {
                 stopSession();
@@ -358,25 +398,45 @@ public class MainActivity extends FlutterActivity {
                 badge.setNumber(0); // This might seem redundant, but it is for if overwrite is false and the one notification that gets added
                 ArrayList<Note> currentNote = new ArrayList<>();
                 if (sessionEnded) {
-                    if (currentNoteIndex >= 1) {
+                    if (!shuffle) {
                         // This if statement is due to the currentNoteIndex++ in the timer that causes the noteindex to be 1 more than it is
-                        currentNote.add(notesList.get(currentNoteIndex - 1));
+                        if (currentNoteIndex >= 1) {
+                            currentNote.add(notesList.get(currentNoteIndex - 1));
+                        } else {
+                            // If currentNoteIndex = 0, then let it stay at 0
+                            currentNote.add(notesList.get(currentNoteIndex));
+                        }
                     } else {
-                        // If currentNoteIndex = 0, then let it stay at 0
-                        currentNote.add(notesList.get(currentNoteIndex));
+                        currentNote.add(notesList.get(previousNoteIndex));
                     }
+
                     currentNote.add(new Note("Session Ended.", ""));
                 } else {
-                    Note note = new Note(notesList.get(currentNoteIndex).getTitle(), notesList.get(currentNoteIndex).getBody());
-                    note.setTitle("Upcoming Note: " + note.getTitle());
-                    currentNote.add(note);
+                    // This if statement is due to the currentNoteIndex++ in the timer that causes the noteindex to be 1 more than it is
+                    if (!shuffle) {
+                        if (currentNoteIndex >= 1) {
+                            currentNote.add(notesList.get(currentNoteIndex - 1));
+                        } else {
+                            currentNote.add(notesList.get(currentNoteIndex));
+                        }
+                    } else {
+                        currentNote.add(notesList.get(previousNoteIndex));
+                    }
+//                    Note note = new Note(notesList.get(currentNoteIndex).getTitle(), notesList.get(currentNoteIndex).getBody());
+//                    note.setTitle("Upcoming Note: " + note.getTitle());
+//                    currentNote.add(note);
                 }
                 mAdapter.setNotes(currentNote);
                 mAdapter.notifyDataSetChanged();
             } else {
                 mAdapter.setNotes(unreadNotesList);
                 mAdapter.notifyDataSetChanged();
-                unreadNotesList.clear();
+
+                if (sessionEnded) {
+                    mAdapter.addNote(new Note("Session Ended.", ""));
+                } else {
+                    unreadNotesList.clear();
+                }
                 badge.setNumber(0);
             }
 

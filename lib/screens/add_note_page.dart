@@ -213,7 +213,12 @@ class AddNotePageState extends State<AddNotePage> {
       note = Note(this.note.studySetId, noteTitle, noteBody);
       // Update number of cards of studyset once added note
       widget.studySet.numCards = widget.studySet.numCards++;
-      helper.updateStudySet(widget.studySet);
+      int result = await helper.updateStudySet(widget.studySet);
+      if (result != 0) {
+        print("successfully updated study set number of cards.");
+      } else {
+        print("failed ot update study set number of cards.");
+      }
     } else {
       note =
           Note.withId(this.note.id, this.note.studySetId, noteTitle, noteBody);

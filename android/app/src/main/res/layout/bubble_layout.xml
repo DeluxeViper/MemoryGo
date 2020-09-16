@@ -33,6 +33,16 @@
                 android:textColor="@android:color/black"
                 android:textSize="17sp"
                 android:textStyle="bold" />
+<!--            <TextView-->
+<!--                android:id="@+id/unread_notes_notifier"-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_marginEnd="20dp"-->
+<!--                android:gravity="center_vertical"-->
+<!--                android:text="@string/study_set_title"-->
+<!--                android:textColor="@android:color/black"-->
+<!--                android:textSize="17sp"-->
+<!--                android:textStyle="bold" />-->
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/notes_recycler_view"

@@ -192,7 +192,12 @@ class NotesPageState extends State<NotesPage> {
       // Success
       _showSnackBar(context, 'Note deleted Successfully');
       studySet.numCards--;
-      helper.updateStudySet(widget.studySet);
+      int updateSetResult = await helper.updateStudySet(this.studySet);
+      if (updateSetResult != 0) {
+        print("successfully updated study set number of cards.");
+      } else {
+        print("failed ot update study set number of cards.");
+      }
       updateNoteListView();
     } else {
       // Failure
