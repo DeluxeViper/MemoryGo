@@ -7,7 +7,6 @@ import 'package:flutter/material.dart';
 import 'package:sqflite/sqflite.dart';
 
 import '../notes_page.dart';
-import 'header_with_search_box.dart';
 
 class StudySetList extends StatefulWidget {
   StudySetList({Key key, this.title}) : super(key: key);
@@ -21,8 +20,8 @@ class StudySetList extends StatefulWidget {
 class StudySetListState extends State<StudySetList> {
   static DatabaseHelper databaseHelper = DatabaseHelper();
   TextEditingController nameOfSetController, searchController;
-  static List<StudySet> studySets;
-  int count = 0;
+  static List<StudySet> studySets, filteredStudySets;
+  int fetchedStudySetListCount = 0, filteredStudySetCount = 0;
 
   @override
   void initState() {
@@ -138,7 +137,7 @@ class StudySetListState extends State<StudySetList> {
                         controller: searchController,
                         maxLines: 1,
                         onChanged: (studySetTitle) {
-                          onItemChanged(studySetTitle);
+                          buildStudySetComponentList();
                         },
                         decoration: InputDecoration(
                           contentPadding: EdgeInsets.only(left: 15),
@@ -169,7 +168,7 @@ class StudySetListState extends State<StudySetList> {
   ListView getStudySetListView() {
     return ListView.builder(
         physics: BouncingScrollPhysics(),
-        itemCount: studySets.length,
+        itemCount: filteredStudySetCount,
         itemBuilder: (BuildContext context, int index) {
           return Container(
               width: double.infinity,
@@ -178,7 +177,7 @@ class StudySetListState extends State<StudySetList> {
                   child: InkWell(
                       splashColor: Colors.blue.withAlpha(20),
                       onTap: () {
-                        openNotesPage(studySets[index]);
+                        openNotesPage(filteredStudySets[index]);
                       },
                       // Study set
                       child: Column(
@@ -197,7 +196,7 @@ class StudySetListState extends State<StudySetList> {
                                 ),
                                 new Padding(
                                     padding: const EdgeInsets.all(10.0),
-                                    child: Text(studySets[index].title,
+                                    child: Text(filteredStudySets[index].title,
                                         style: TextStyle(fontSize: 20))),
                               ],
                             ),
@@ -205,12 +204,13 @@ class StudySetListState extends State<StudySetList> {
                           // Date of study set
                           new Padding(
                               padding: EdgeInsets.only(left: 15.0, bottom: 5),
-                              child: Text(studySets[index].date)),
+                              child: Text(filteredStudySets[index].date)),
                           // Number of cards
                           new Padding(
                               padding: EdgeInsets.only(left: 15, bottom: 5),
-                              child:
-                                  Text(studySets[index].numCards.toString())),
+                              child: Text(filteredStudySets[index]
+                                  .numCards
+                                  .toString())),
                           // Delete and settings page icons
                           new Padding(
                               padding: EdgeInsets.all(15.0),
@@ -291,13 +291,31 @@ class StudySetListState extends State<StudySetList> {
       studySetListFuture.then((studySetList) {
         setState(() {
           studySets = studySetList;
-          count = studySetList.length;
+          fetchedStudySetListCount = studySetList.length;
+          buildStudySetComponentList();
         });
       });
     });
   }
 
-  onItemChanged(String value) {}
+  void buildStudySetComponentList() {
+    List<StudySet> studySetComponentList = [];
+    if (searchController.text.isNotEmpty) {
+      studySets.forEach((studySet) {
+        if (studySet.title
+            .toLowerCase()
+            .contains(searchController.text.toLowerCase())) {
+          studySetComponentList.add(studySet);
+        }
+      });
+    } else {
+      studySetComponentList = studySets;
+    }
+    setState(() {
+      filteredStudySets = studySetComponentList;
+      filteredStudySetCount = studySetComponentList.length;
+    });
+  }
 
   void _addSet() async {
     print('Adding set');
