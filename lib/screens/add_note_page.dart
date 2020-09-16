@@ -137,7 +137,7 @@ class AddNotePageState extends State<AddNotePage> {
                       children: [
                         IconButton(
                           icon: Icon(Icons.arrow_back),
-                          onPressed: () => {Navigator.pop(context)},
+                          onPressed: () => {Navigator.pop(context, false)},
                         ),
                         Text(
                           (widget.studySet.title.length < 15
@@ -190,15 +190,17 @@ class AddNotePageState extends State<AddNotePage> {
   }
 
   void _delete(BuildContext context, Note note) async {
-    int result = await helper.deleteNote(note.id);
-    if (result != 0) {
-      // Success
-      widget.studySet.numCards--;
-      helper.updateStudySet(widget.studySet);
-      Navigator.pop(context, true);
-    } else {
-      // Failure
+    if (note.id == null) {
       Navigator.pop(context, false);
+    } else {
+      int result = await helper.deleteNote(note.id);
+      if (result != 0) {
+        // Success
+        Navigator.pop(context, true);
+      } else {
+        // Failure
+        Navigator.pop(context, false);
+      }
     }
   }
 
@@ -212,13 +214,13 @@ class AddNotePageState extends State<AddNotePage> {
     if (this.note.id == null) {
       note = Note(this.note.studySetId, noteTitle, noteBody);
       // Update number of cards of studyset once added note
-      widget.studySet.numCards = widget.studySet.numCards++;
-      int result = await helper.updateStudySet(widget.studySet);
-      if (result != 0) {
-        print("successfully updated study set number of cards.");
-      } else {
-        print("failed ot update study set number of cards.");
-      }
+      // widget.studySet.numCards = widget.studySet.numCards++;
+      // int result = await helper.updateStudySet(widget.studySet);
+      // if (result != 0) {
+      //   print("successfully updated study set number of cards.");
+      // } else {
+      //   print("failed ot update study set number of cards.");
+      // }
     } else {
       note =
           Note.withId(this.note.id, this.note.studySetId, noteTitle, noteBody);
