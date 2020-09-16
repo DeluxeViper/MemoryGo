@@ -131,7 +131,7 @@ class StudySet {
     var date = new DateTime.now().toString();
     var dateParse = DateTime.parse(date);
     var formattedDate =
-        "${dateParse.day.toString().padLeft(2, '0')}-${dateParse.month.toString().padLeft(2, '0')}-${dateParse.year} ${dateParse.hour.toString().padLeft(2, '0')}:${dateParse.minute.toString().padLeft(2, '0')}";
+        "Created: ${dateParse.day.toString().padLeft(2, '0')}-${dateParse.month.toString().padLeft(2, '0')}-${dateParse.year} ${dateParse.hour.toString().padLeft(2, '0')}:${dateParse.minute.toString().padLeft(2, '0')}";
 
     return formattedDate;
   }

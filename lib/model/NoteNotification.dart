@@ -1,5 +1,3 @@
-import 'package:meta/meta.dart';
-
 class NoteNotification {
   final int id;
   final String title;

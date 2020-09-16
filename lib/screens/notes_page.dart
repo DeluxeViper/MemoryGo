@@ -42,62 +42,65 @@ class NotesPageState extends State<NotesPage> {
       updateNoteListView();
     }
 
-    return MaterialApp(
-      title: 'Notes',
-      debugShowCheckedModeBanner: false,
-      home: new Scaffold(
-        appBar: new AppBar(
-            title: Text('Notes of ${widget.studySet.title}'),
-            automaticallyImplyLeading: true,
-            leading: IconButton(
-              icon: Icon(Icons.arrow_back),
-              onPressed: () => Navigator.pop(context, notesList.length),
-            ),
-            actions: <Widget>[
-              Padding(
-                  padding: EdgeInsets.only(right: 20),
-                  child: GestureDetector(
-                      child: Icon(Icons.settings),
-                      onTap: () => openSettingsPage(this.studySet)))
-            ]),
-        body: new Container(
-            child: Column(
-          children: [
+    return new Scaffold(
+      appBar: new AppBar(
+          title: Text(
+            'Notes of ${widget.studySet.title}',
+            style: TextStyle(color: Colors.white),
+          ),
+          automaticallyImplyLeading: true,
+          leading: IconButton(
+            icon: Icon(Icons.arrow_back),
+            color: Colors.white,
+            onPressed: () => Navigator.pop(context, notesList.length),
+          ),
+          actions: <Widget>[
             Padding(
-                padding: EdgeInsets.only(top: 20),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    // Go Button
-                    RaisedButton(
-                      onPressed: () {
-                        if (Platform.isAndroid) {
-                          if (notesList.isEmpty) {
-                            _showSnackBar(context,
-                                "Error, Cannot start. ${studySet.title} is Empty.");
-                          } else {
-                            openNoteBubble(notesList);
-                          }
-                        } else {
-                          _showSnackBar(context, "Platform unrecognized.");
-                        }
-                      },
-                      color: kPrimaryColor,
-                      textColor: Colors.white,
-                      child: Padding(
-                          padding: EdgeInsets.only(top: 10, bottom: 10),
-                          child: Text('Go')),
+                padding: EdgeInsets.only(right: 20),
+                child: GestureDetector(
+                    child: Icon(
+                      Icons.settings,
+                      color: Colors.white,
                     ),
-                  ],
-                )),
-            Expanded(child: getNoteListView())
-          ],
-        )),
-        floatingActionButton: FloatingActionButton(
-          onPressed: () => openAddNotePage(context: context),
-          tooltip: 'Add Note',
-          child: Icon(Icons.add),
-        ),
+                    onTap: () => openSettingsPage(this.studySet)))
+          ]),
+      body: new Container(
+          child: Column(
+        children: [
+          Padding(
+              padding: EdgeInsets.only(top: 20),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  // Go Button
+                  RaisedButton(
+                    onPressed: () {
+                      if (Platform.isAndroid) {
+                        if (notesList.isEmpty) {
+                          _showSnackBar(context,
+                              "Error, Cannot start. ${studySet.title} is Empty.");
+                        } else {
+                          openNoteBubble(notesList);
+                        }
+                      } else {
+                        _showSnackBar(context, "Platform unrecognized.");
+                      }
+                    },
+                    color: kPrimaryColor,
+                    textColor: Colors.white,
+                    child: Padding(
+                        padding: EdgeInsets.only(top: 10, bottom: 10),
+                        child: Text('Go')),
+                  ),
+                ],
+              )),
+          Expanded(child: getNoteListView())
+        ],
+      )),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => openAddNotePage(context: context),
+        tooltip: 'Add Note',
+        child: Icon(Icons.add),
       ),
     );
   }

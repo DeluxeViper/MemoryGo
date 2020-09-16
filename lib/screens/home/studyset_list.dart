@@ -6,7 +6,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:sqflite/sqflite.dart';
 
-import 'notes_page.dart';
+import '../notes_page.dart';
+import 'header_with_search_box.dart';
 
 class StudySetList extends StatefulWidget {
   StudySetList({Key key, this.title}) : super(key: key);
@@ -19,15 +20,15 @@ class StudySetList extends StatefulWidget {
 
 class StudySetListState extends State<StudySetList> {
   static DatabaseHelper databaseHelper = DatabaseHelper();
-  TextEditingController nameOfSetController;
+  TextEditingController nameOfSetController, searchController;
   static List<StudySet> studySets;
   int count = 0;
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     nameOfSetController = new TextEditingController();
+    searchController = new TextEditingController();
   }
 
   void dispose() {
@@ -37,30 +38,29 @@ class StudySetListState extends State<StudySetList> {
 
   @override
   Widget build(BuildContext context) {
-    var appBar = AppBar(title: Text(widget.title));
+    Size size = MediaQuery.of(context).size;
     if (studySets == null) {
       studySets = List<StudySet>();
       updateListView();
     }
+
     return Scaffold(
-      appBar: appBar,
-      body: Container(
+      appBar: buildAppBar(),
+      body: SingleChildScrollView(
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            // Title
-            new Container(
-                margin: new EdgeInsets.only(top: 30.0, left: 10.0),
-                child: Padding(
-                    padding: EdgeInsets.only(left: 20),
-                    child: Text(
-                      'Study Sets',
-                      style:
-                          TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
-                    ))),
-            // Cards
-            Expanded(child: getStudySetListView())
+          children: [
+            buildHeaderWithSearchBox(size),
+            Container(
+              height: 400,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  // Cards
+                  Expanded(child: getStudySetListView())
+                ],
+              ),
+            ),
           ],
         ),
       ),
@@ -68,6 +68,99 @@ class StudySetListState extends State<StudySetList> {
         onPressed: () => addStudySetModalBottomSheet(context),
         tooltip: 'Add Study Set',
         child: Icon(Icons.add),
+      ),
+    );
+  }
+
+  AppBar buildAppBar() {
+    return AppBar(
+      title: Padding(
+        padding: EdgeInsets.only(left: 0, top: 15),
+        child: Text(
+          "${widget.title}",
+          style: TextStyle(color: Colors.white, fontSize: 25),
+        ),
+      ),
+      elevation: 0,
+    );
+  }
+
+  Container buildHeaderWithSearchBox(Size size) {
+    return Container(
+      height: size.height * 0.2,
+      margin: EdgeInsets.only(bottom: 30),
+      child: Stack(
+        children: [
+          // 0.2 of height blue box
+          Container(
+            padding: EdgeInsets.only(left: 15, right: 15, bottom: 50),
+            height: size.height * 0.2 - 20,
+            decoration: BoxDecoration(
+              color: kPrimaryColor,
+              borderRadius: BorderRadius.only(
+                  bottomLeft: Radius.circular(36),
+                  bottomRight: Radius.circular(36)),
+            ),
+          ),
+          // Title
+          new Container(
+              margin: new EdgeInsets.only(top: 30.0),
+              child: Padding(
+                  padding: EdgeInsets.only(left: 15),
+                  child: Text(
+                    'My Study Sets',
+                    style: TextStyle(
+                        fontSize: 28,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white),
+                  ))),
+          // Search bar
+          Positioned(
+              bottom: 0,
+              left: 10,
+              right: 10,
+              child: Container(
+                alignment: Alignment.center,
+                height: 50,
+                decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: [
+                      BoxShadow(
+                          offset: Offset(0, 10),
+                          blurRadius: 50,
+                          color: kPrimaryColor.withOpacity(0.23))
+                    ]),
+                child: Row(
+                  children: <Widget>[
+                    Expanded(
+                      child: TextField(
+                        controller: searchController,
+                        maxLines: 1,
+                        onChanged: (studySetTitle) {
+                          onItemChanged(studySetTitle);
+                        },
+                        decoration: InputDecoration(
+                          contentPadding: EdgeInsets.only(left: 15),
+                          hintText: "Search",
+                          hintStyle:
+                              TextStyle(color: kPrimaryColor.withOpacity(0.5)),
+                          enabledBorder: InputBorder.none,
+                          focusedBorder: InputBorder.none,
+                        ),
+                        textInputAction: TextInputAction.search,
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(10.0),
+                      child: Image(
+                          alignment: Alignment.center,
+                          image: AssetImage('assets/icons/search.png')),
+                    )
+                  ],
+                ),
+              )),
+        ],
       ),
     );
   }
@@ -92,23 +185,35 @@ class StudySetListState extends State<StudySetList> {
                         mainAxisAlignment: MainAxisAlignment.start,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
-                          // Title of study set
-                          new Padding(
-                              padding: const EdgeInsets.all(10.0),
-                              child: Text(studySets[index].title,
-                                  style: TextStyle(fontSize: 20))),
+                          Padding(
+                            padding: const EdgeInsets.all(10.0),
+                            child: Row(
+                              children: [
+                                Image(
+                                  height: 40,
+                                  width: 40,
+                                  image: AssetImage(
+                                      'assets/icons/notebook_icon.png'),
+                                ),
+                                new Padding(
+                                    padding: const EdgeInsets.all(10.0),
+                                    child: Text(studySets[index].title,
+                                        style: TextStyle(fontSize: 20))),
+                              ],
+                            ),
+                          ),
                           // Date of study set
                           new Padding(
-                              padding: EdgeInsets.all(10.0),
+                              padding: EdgeInsets.only(left: 15.0, bottom: 5),
                               child: Text(studySets[index].date)),
                           // Number of cards
                           new Padding(
-                              padding: EdgeInsets.all(10.0),
+                              padding: EdgeInsets.only(left: 15, bottom: 5),
                               child:
                                   Text(studySets[index].numCards.toString())),
                           // Delete and settings page icons
                           new Padding(
-                              padding: EdgeInsets.all(10.0),
+                              padding: EdgeInsets.all(15.0),
                               child: new Row(
                                 crossAxisAlignment: CrossAxisAlignment.end,
                                 mainAxisAlignment: MainAxisAlignment.end,
@@ -178,6 +283,22 @@ class StudySetListState extends State<StudySetList> {
         });
   }
 
+  void updateListView() {
+    final Future<Database> dbFuture = databaseHelper.initializeDatabase();
+    dbFuture.then((database) {
+      Future<List<StudySet>> studySetListFuture =
+          databaseHelper.getStudySetList();
+      studySetListFuture.then((studySetList) {
+        setState(() {
+          studySets = studySetList;
+          count = studySetList.length;
+        });
+      });
+    });
+  }
+
+  onItemChanged(String value) {}
+
   void _addSet() async {
     print('Adding set');
     StudySet studySet = new StudySet('', 0);
@@ -246,20 +367,6 @@ class StudySetListState extends State<StudySetList> {
   void _showSnackbar(BuildContext context, String message) {
     final snackBar = SnackBar(content: Text(message));
     Scaffold.of(context).showSnackBar(snackBar);
-  }
-
-  void updateListView() {
-    final Future<Database> dbFuture = databaseHelper.initializeDatabase();
-    dbFuture.then((database) {
-      Future<List<StudySet>> studySetListFuture =
-          databaseHelper.getStudySetList();
-      studySetListFuture.then((studySetList) {
-        setState(() {
-          studySets = studySetList;
-          count = studySetList.length;
-        });
-      });
-    });
   }
 
   void openSettingsPage(StudySet studySet) {

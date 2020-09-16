@@ -1,22 +1,12 @@
 import 'package:MemoryGo/constants.dart';
-import 'package:MemoryGo/screens/studyset_list.dart';
+import 'package:MemoryGo/screens/home/studyset_list.dart';
 import 'package:flutter/material.dart';
 
-// import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-
-// final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-//     FlutterLocalNotificationsPlugin();
-// NotificationAppLaunchDetails notificationAppLaunchDetails;
-// WidgetsFlutterBinding.ensureInitialized();
-// notificationAppLaunchDetails =
-//     await flutterLocalNotificationsPlugin.getNotificationAppLaunchDetails();
-// await initNotifications(flutterLocalNotificationsPlugin);
-// requestIOSPermissions(flutterLocalNotificationsPlugin);
 void main() {
-  runApp(MyApp());
+  runApp(MemoryGoApp());
 }
 
-class MyApp extends StatelessWidget {
+class MemoryGoApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
