@@ -6,6 +6,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:sqflite/sqflite.dart';
 
+import '../app_settings_page.dart';
 import '../notes_page.dart';
 
 class StudySetList extends StatefulWidget {
@@ -44,25 +45,50 @@ class StudySetListState extends State<StudySetList> {
     }
 
     return Scaffold(
-      appBar: buildAppBar(),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            buildHeaderWithSearchBox(size),
-            Container(
-              height: 400,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  // Cards
-                  Expanded(child: getStudySetListView())
+      resizeToAvoidBottomPadding: false,
+      body: NestedScrollView(
+          floatHeaderSlivers: true,
+          headerSliverBuilder: (context, innerBoxIsScrolled) {
+            return <Widget>[
+              SliverAppBar(
+                expandedHeight: 50.0,
+                floating: true,
+                pinned: false,
+                title: Text(
+                  'MemoryGo',
+                  style: TextStyle(color: Colors.white),
+                ),
+                flexibleSpace: FlexibleSpaceBar(),
+                actions: [
+                  Padding(
+                    padding: const EdgeInsets.only(right: 10.0),
+                    child: IconButton(
+                        icon: Icon(Icons.settings, color: Colors.white),
+                        onPressed: () {
+                          openAppSettingsPage();
+                        }),
+                  )
                 ],
               ),
-            ),
-          ],
-        ),
-      ),
+            ];
+          },
+          body: Column(
+            mainAxisSize: MainAxisSize.max,
+            children: [
+              buildHeaderWithSearchBox(size),
+              Container(
+                height: 400,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    // Cards
+                    Expanded(flex: 1, child: getStudySetListView())
+                  ],
+                ),
+              ),
+            ],
+          )),
       floatingActionButton: FloatingActionButton(
         onPressed: () => addStudySetModalBottomSheet(context),
         tooltip: 'Add Study Set',
@@ -71,7 +97,7 @@ class StudySetListState extends State<StudySetList> {
     );
   }
 
-  AppBar buildAppBar() {
+  AppBar buildAppBar(BuildContext context) {
     return AppBar(
       title: Padding(
         padding: EdgeInsets.only(left: 0, top: 15),
@@ -80,6 +106,14 @@ class StudySetListState extends State<StudySetList> {
           style: TextStyle(color: Colors.white, fontSize: 25),
         ),
       ),
+      actions: [
+        Padding(
+          padding: const EdgeInsets.only(right: 10.0),
+          child: IconButton(
+              icon: Icon(Icons.settings, color: Colors.white),
+              onPressed: () => print("Unimplemented.")),
+        )
+      ],
       elevation: 0,
     );
   }
@@ -103,7 +137,7 @@ class StudySetListState extends State<StudySetList> {
           ),
           // Title
           new Container(
-              margin: new EdgeInsets.only(top: 30.0),
+              margin: new EdgeInsets.only(top: 40.0),
               child: Padding(
                   padding: EdgeInsets.only(left: 15),
                   child: Text(
@@ -167,13 +201,16 @@ class StudySetListState extends State<StudySetList> {
   // Displays studyset list
   ListView getStudySetListView() {
     return ListView.builder(
+        shrinkWrap: false,
+        padding: EdgeInsets.only(bottom: 20),
         physics: BouncingScrollPhysics(),
         itemCount: filteredStudySetCount,
         itemBuilder: (BuildContext context, int index) {
           return Container(
               width: double.infinity,
-              margin: EdgeInsets.all(20.0),
+              margin: EdgeInsets.all(15.0),
               child: Card(
+                  elevation: 5,
                   child: InkWell(
                       splashColor: Colors.blue.withAlpha(20),
                       onTap: () {
@@ -390,6 +427,11 @@ class StudySetListState extends State<StudySetList> {
   void openSettingsPage(StudySet studySet) {
     Navigator.of(context).push(
         MaterialPageRoute(builder: (context) => new SettingsPage(studySet)));
+  }
+
+  void openAppSettingsPage() {
+    Navigator.of(context)
+        .push(MaterialPageRoute(builder: (context) => new AppSettingsPage()));
   }
 
   void openNotesPage(StudySet studySet) async {

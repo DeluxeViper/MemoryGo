@@ -41,8 +41,6 @@ class AddNotePageState extends State<AddNotePage> {
   @override
   void dispose() {
     noteBodyFocusNode.dispose();
-    // noteNameController.dispose();
-    // noteBodyController.dispose();
     super.dispose();
   }
 

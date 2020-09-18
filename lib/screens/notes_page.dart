@@ -26,7 +26,7 @@ class NotesPage extends StatefulWidget {
 // Note: might want to add notes array to note page?
 class NotesPageState extends State<NotesPage> {
   bool isSessionEnded;
-  int count = 0;
+  int notesListCount = 0;
   List<Note> notesList;
   DatabaseHelper helper = DatabaseHelper();
   StudySet studySet;
@@ -43,30 +43,14 @@ class NotesPageState extends State<NotesPage> {
     }
 
     return new Scaffold(
-      appBar: new AppBar(
-          title: Text(
-            'Notes of ${widget.studySet.title}',
-            style: TextStyle(color: Colors.white),
-          ),
-          automaticallyImplyLeading: true,
-          leading: IconButton(
-            icon: Icon(Icons.arrow_back),
-            color: Colors.white,
-            onPressed: () => Navigator.pop(context, notesList.length),
-          ),
-          actions: <Widget>[
-            Padding(
-                padding: EdgeInsets.only(right: 20),
-                child: GestureDetector(
-                    child: Icon(
-                      Icons.settings,
-                      color: Colors.white,
-                    ),
-                    onTap: () => openSettingsPage(this.studySet)))
-          ]),
+      appBar: buildAppBar(context),
       body: new Container(
           child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          Container(
+            height: 5,
+          ),
           Padding(
               padding: EdgeInsets.only(top: 20),
               child: Row(
@@ -86,11 +70,11 @@ class NotesPageState extends State<NotesPage> {
                         _showSnackBar(context, "Platform unrecognized.");
                       }
                     },
-                    color: kPrimaryColor,
+                    color: Colors.green,
                     textColor: Colors.white,
                     child: Padding(
                         padding: EdgeInsets.only(top: 10, bottom: 10),
-                        child: Text('Go')),
+                        child: Icon(Icons.play_arrow)),
                   ),
                 ],
               )),
@@ -105,62 +89,112 @@ class NotesPageState extends State<NotesPage> {
     );
   }
 
+  AppBar buildAppBar(BuildContext context) {
+    return new AppBar(
+        title: Text(
+          'Notes of ${widget.studySet.title}',
+          style: TextStyle(color: kPrimaryColor, fontWeight: FontWeight.bold),
+        ),
+        elevation: 0,
+        backgroundColor: Colors.white,
+        automaticallyImplyLeading: true,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          color: kPrimaryColor,
+          onPressed: () => Navigator.pop(context, notesList.length),
+        ),
+        actions: <Widget>[
+          Padding(
+              padding: EdgeInsets.only(right: 20),
+              child: GestureDetector(
+                  child: Icon(
+                    Icons.settings,
+                    color: kPrimaryColor,
+                    semanticLabel: 'Study Set Settings',
+                  ),
+                  onTap: () => openSettingsPage(this.studySet)))
+        ]);
+  }
+
   ListView getNoteListView() {
     return ListView.builder(
         physics: BouncingScrollPhysics(),
-        itemCount: this.count,
+        itemCount: this.notesListCount,
         itemBuilder: (BuildContext context, int index) {
           return Container(
               width: double.infinity - 20,
               margin: EdgeInsets.all(20.0),
-              child: new Card(
-                  child: new Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  new Padding(
-                      padding: EdgeInsets.all(20.0),
-                      child: Text(notesList[index].title,
-                          style: TextStyle(fontSize: 20))),
-                  new Padding(
-                      padding: EdgeInsets.all(20.0),
-                      child: Text(notesList[index].body)),
-                  new Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      new Padding(
-                          padding: EdgeInsets.only(left: 20.0),
-                          child: Text(
-                            'Created ${notesList[index].date}',
-                            style: TextStyle(fontSize: 10),
-                          )),
-                      new Container(
-                          padding: EdgeInsets.only(bottom: 10.0, right: 10.0),
-                          child: new Row(
-                            children: [
-                              new GestureDetector(
-                                  onTap: () {
-                                    openAddNotePage(
-                                        context: context,
-                                        note: notesList[index]);
-                                  },
-                                  child: Icon(
-                                    Icons.edit,
-                                    semanticLabel: 'Edit Note',
-                                  )),
-                              new SizedBox(height: 10.0, width: 10.0),
-                              new GestureDetector(
-                                  onTap: () {
-                                    _delete(context, notesList[index]);
-                                  },
-                                  child: Icon(Icons.delete,
-                                      semanticLabel: 'Delete Note'))
-                            ],
-                          ))
-                    ],
-                  ),
-                ],
-              )));
+              child: GestureDetector(
+                onTap: () {
+                  openAddNotePage(context: context, note: notesList[index]);
+                },
+                child: new Card(
+                    elevation: 10,
+                    child: new Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Row(
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.only(left: 10),
+                              child: Image(
+                                height: 40,
+                                width: 40,
+                                image: AssetImage('assets/icons/note-icon.png'),
+                              ),
+                            ),
+                            Expanded(
+                              child: new Padding(
+                                  padding: EdgeInsets.all(20.0),
+                                  child: Text((notesList[index].title),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: TextStyle(fontSize: 20))),
+                            ),
+                          ],
+                        ),
+                        new Padding(
+                            padding: EdgeInsets.all(20.0),
+                            child: Text(notesList[index].body)),
+                        new Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            new Padding(
+                                padding: EdgeInsets.only(left: 20.0),
+                                child: Text(
+                                  'Created ${notesList[index].date}',
+                                  style: TextStyle(fontSize: 10),
+                                )),
+                            new Container(
+                                padding:
+                                    EdgeInsets.only(bottom: 10.0, right: 10.0),
+                                child: new Row(
+                                  children: [
+                                    new GestureDetector(
+                                        onTap: () {
+                                          openAddNotePage(
+                                              context: context,
+                                              note: notesList[index]);
+                                        },
+                                        child: Icon(
+                                          Icons.edit,
+                                          semanticLabel: 'Edit Note',
+                                        )),
+                                    new SizedBox(height: 10.0, width: 10.0),
+                                    new GestureDetector(
+                                        onTap: () {
+                                          _delete(context, notesList[index]);
+                                        },
+                                        child: Icon(Icons.delete,
+                                            semanticLabel: 'Delete Note'))
+                                  ],
+                                ))
+                          ],
+                        ),
+                      ],
+                    )),
+              ));
         });
   }
 
@@ -220,7 +254,7 @@ class NotesPageState extends State<NotesPage> {
       noteListFuture.then((noteList) {
         setState(() {
           this.notesList = noteList;
-          this.count = noteList.length;
+          this.notesListCount = noteList.length;
           this.studySet.numCards = notesList.length;
         });
 
