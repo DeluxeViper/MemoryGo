@@ -26,7 +26,6 @@ class SettingsPageState extends State<SettingsPage>
       repeatVal,
       overwriteVal,
       shuffleVal;
-
   StudySet studySet;
 
   SettingsPageState(this.studySet) {
@@ -58,12 +57,6 @@ class SettingsPageState extends State<SettingsPage>
   }
 
   @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-  }
-
-  @override
   Widget build(BuildContext context) {
     getFrequency();
     return Scaffold(
@@ -75,13 +68,8 @@ class SettingsPageState extends State<SettingsPage>
           onPressed: () => Navigator.pop(context, true),
         ),
         actions: [
-          RaisedButton.icon(
-            label: Text('Save', style: TextStyle(color: Colors.white)),
-            icon: Icon(
-              Icons.navigate_next,
-              color: Colors.white,
-              semanticLabel: 'Save',
-            ),
+          RaisedButton(
+            child: Text('Save', style: TextStyle(color: Colors.white)),
             color: kPrimaryColor,
             onPressed: () => onSaved(),
           )
