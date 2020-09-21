@@ -50,7 +50,6 @@ public class BubbleLayout extends BubbleBaseLayout {
     private static final int TOUCH_TIME_THRESHOLD = 150;
     private long lastTouchDown;
     private MoveAnimator animator;
-    private int width;
     private WindowManager windowManager;
     private boolean shouldStickToWall = true;
     private boolean isLeft;
@@ -96,6 +95,7 @@ public class BubbleLayout extends BubbleBaseLayout {
     }
 
     private void initializeView() {
+        isLeft = true;
         setClickable(true);
     }
 
@@ -107,8 +107,6 @@ public class BubbleLayout extends BubbleBaseLayout {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        int middle = width / 2;
-
         if (event != null) {
             switch (event.getAction()) {
                 case MotionEvent.ACTION_DOWN:
@@ -122,7 +120,12 @@ public class BubbleLayout extends BubbleBaseLayout {
                     animator.stop();
                     break;
                 case MotionEvent.ACTION_MOVE:
-                    int x = initialX + (int) (event.getRawX() - initialTouchX);
+                    int x;
+                    if (isLeft) {
+                        x = initialX + (int) (event.getRawX() - initialTouchX);
+                    } else {
+                        x = initialX + (int) (event.getRawX() - initialTouchX) - this.getWidth();
+                    }
                     int y = initialY + (int) (event.getRawY() - initialTouchY);
                     getViewParams().x = x;
                     getViewParams().y = y;
@@ -144,7 +147,6 @@ public class BubbleLayout extends BubbleBaseLayout {
                     }
                     break;
             }
-            isLeft = getViewParams().x < middle;
         }
         return super.onTouchEvent(event);
     }
@@ -182,7 +184,6 @@ public class BubbleLayout extends BubbleBaseLayout {
         Display display = getWindowManager().getDefaultDisplay();
         Point size = new Point();
         display.getSize(size);
-        width = (size.x - this.getWidth());
         screenWidth = metrics.widthPixels;
     }
 
@@ -196,10 +197,16 @@ public class BubbleLayout extends BubbleBaseLayout {
 
     public void goToWall() {
         if (shouldStickToWall) {
-            int middle = screenWidth / 2;
-            float nearestXWall = getViewParams().x >= middle ? screenWidth : 0;
+            int middle;
+            if (isLeft){
+                    middle = (screenWidth - this.getWidth()) / 2;
+            } else {
+                middle = screenWidth / 2;
+            }
+            float nearestXWall;
+            Log.d(TAG, "goToWall: isleft: " + isLeft);
+            nearestXWall = getViewParams().x >= middle ? screenWidth : 0;
             animator.start(nearestXWall, getViewParams().y);
-//            Log.d(TAG, "goToWall: nearestXWall: " + nearestXWall + ", screenWidth: " + screenWidth);
             if (getViewParams().x >= middle) {
                 isLeft = false;
             } else {
@@ -211,7 +218,6 @@ public class BubbleLayout extends BubbleBaseLayout {
     private void move(float deltaX, float deltaY) {
         getViewParams().x += deltaX;
         getViewParams().y += deltaY;
-//        Log.d(TAG, "move: " + getViewParams().x + ", " + getViewParams().y);
         windowManager.updateViewLayout(this, getViewParams());
     }
 
@@ -228,7 +234,6 @@ public class BubbleLayout extends BubbleBaseLayout {
         private void start(float x, float y) {
             this.destinationX = x;
             this.destinationY = y;
-//            Log.d(TAG, "start: " + destinationX + ", " + destinationY);
             startingTime = System.currentTimeMillis();
             handler.post(this);
         }

@@ -122,33 +122,40 @@ class _AppSettingsPageState extends State<AppSettingsPage> {
             buildCardWidget(
                 SizedBox(
                   width: MediaQuery.of(context).size.width,
-                  child: Column(
+                  child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.only(top: 10, left: 10),
+                            child: Text(
+                              'Theme Color',
+                              style:
+                                  TextStyle(color: kPrimaryColor, fontSize: 20),
+                            ),
+                          ),
+                          Padding(
+                              padding: const EdgeInsets.only(top: 10, left: 10),
+                              child: Text(
+                                'Pick a theme color for the app.',
+                                style: TextStyle(color: Colors.grey),
+                              ))
+                        ],
+                      ),
+                      Spacer(),
                       Padding(
-                        padding: const EdgeInsets.only(top: 10, left: 10),
-                        child: Text(
-                          'Theme Color',
-                          style: TextStyle(color: kPrimaryColor, fontSize: 20),
+                        padding: const EdgeInsets.all(8.0),
+                        child: GestureDetector(
+                          onTap: () => _openColorPicker(themeNotifier),
+                          child: CircleAvatar(
+                            backgroundColor: kPrimaryColor,
+                            radius: 25.0,
+                            child: null,
+                          ),
                         ),
                       ),
-                      Container(
-                          alignment: Alignment.center,
-                          height: 250,
-                          child: MaterialColorPicker(
-                            selectedColor: kPrimaryColor,
-                            allowShades: true,
-                            onColorChange: (Color color) {
-                              print(color);
-                              setState(() {
-                                kPrimaryColor = color;
-                              });
-                              onThemeChanged(themeNotifier);
-                            },
-                            onMainColorChange: (ColorSwatch color) {
-                              // Handle main color changes
-                            },
-                          )),
                     ],
                   ),
                 ),
@@ -203,5 +210,52 @@ class _AppSettingsPageState extends State<AppSettingsPage> {
     themeNotifier.setTheme(appTheme);
     var prefs = await SharedPreferences.getInstance();
     prefs.setInt('primaryColor', kPrimaryColor.value);
+  }
+
+  void _openColorPicker(ThemeNotifier themeNotifier) async {
+    _openDialog(
+        "Color picker",
+        MaterialColorPicker(
+          selectedColor: kPrimaryColor,
+          allowShades: true,
+          onColorChange: (Color color) {
+            print(color);
+            setState(() {
+              kPrimaryColor = color;
+            });
+            onThemeChanged(themeNotifier);
+          },
+          onMainColorChange: (ColorSwatch color) {
+            // Handle main color changes
+          },
+        ));
+  }
+
+  void _openDialog(String title, Widget content) {
+    showDialog(
+      context: context,
+      builder: (_) {
+        return AlertDialog(
+          contentPadding: const EdgeInsets.all(6.0),
+          title: Text(title),
+          content: content,
+          actions: [
+            FlatButton(
+              child: Text('CANCEL'),
+              onPressed: Navigator.of(context).pop,
+            ),
+            FlatButton(
+              child: Text('SUBMIT'),
+              onPressed: () {
+                Navigator.of(context).pop();
+                setState(() {});
+                // setState(() => _mainColor = _tempMainColor);
+                // setState(() => _shadeColor = _tempShadeColor);
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 }

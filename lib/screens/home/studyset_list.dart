@@ -271,7 +271,7 @@ class StudySetListState extends State<StudySetList> {
                                   new SizedBox(height: 10.0, width: 10.0),
                                   new GestureDetector(
                                       onTap: () {
-                                        showAlertDialog(context, index);
+                                        showDeleteSetDialog(context, index);
                                       },
                                       child: Icon(Icons.delete,
                                           semanticLabel: 'Delete Study set'))
@@ -392,22 +392,21 @@ class StudySetListState extends State<StudySetList> {
     Navigator.pop(context, true);
   }
 
-  showAlertDialog(BuildContext context, int index) {
+  showDeleteSetDialog(BuildContext context, int index) {
     AlertDialog alert = new AlertDialog(
       title: Text("Delete Study Set"),
       content: Text("Are you sure you want to delete this study set?"),
       actions: [
         FlatButton(
-            child: Text("Yes"),
-            color: Colors.green,
+          child: Text('CANCEL'),
+          onPressed: Navigator.of(context).pop,
+        ),
+        FlatButton(
+            child: Text('SUBMIT'),
             onPressed: () {
               _delete(context, studySets[index]);
               Navigator.of(context).pop();
             }),
-        FlatButton(
-            color: Colors.red,
-            child: Text("No"),
-            onPressed: () => Navigator.of(context).pop())
       ],
       elevation: 20.0,
     );
