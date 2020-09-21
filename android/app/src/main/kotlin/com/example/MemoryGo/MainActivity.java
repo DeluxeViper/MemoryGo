@@ -91,9 +91,16 @@ public class MainActivity extends FlutterActivity {
                     if (sessionEnded && !bubbleRemoved) {
                         bubblesManager.recycle();
                         sessionEnded = false;
-                    } else if (!sessionEnded && timer.isRunning()) {
+                    } else if (!sessionEnded && timer.isRunning() && !bubbleRemoved) {
                         // To make sure that when you press go and session is not ended, that it doesn't let allow it to go through.
                         Toast.makeText(getContext(), "Session is already running", Toast.LENGTH_SHORT).show();
+                        return;
+                    } else if (!sessionEnded && timer.isRunning() && bubbleRemoved){
+                        if (!studySetTitle.equals(call.argument("studySetTitle"))){
+                            // If bubble is opened from a different study set, let user know
+                            Toast.makeText(getContext(), "Session is already running from different Study Set", Toast.LENGTH_LONG).show();
+                        }
+                        addNewBubble();
                         return;
                     }
 
@@ -132,7 +139,10 @@ public class MainActivity extends FlutterActivity {
                         throw new Error("Error. Unrecognizable Setting parameter: Shuffle.");
                     }
 
-                    if (durationStr.equals("30 Mins")) {
+                    if (durationStr.equals("15 Mins")){
+                        duration = 1000 * 60 * 15;
+                    }
+                    else if (durationStr.equals("30 Mins")) {
                         duration = 1000 * 60 * 30;
                     } else if (durationStr.equals("1 Hr")) {
                         duration = 1000 * 60 * 60;
@@ -261,8 +271,8 @@ public class MainActivity extends FlutterActivity {
         timer.start();
 
         // Testing purposes
-        duration = 20000;
-        frequency = 4000;
+        // duration = 20000;
+        // frequency = 4000;
 
         timer.scheduleAtFixedRate(new TimerTask() {
             @RequiresApi(api = Build.VERSION_CODES.O)
@@ -287,7 +297,7 @@ public class MainActivity extends FlutterActivity {
                 }
 
             }
-        }, frequency, frequency);
+        }, 0, frequency);
     }
 
     public void stopSession() {

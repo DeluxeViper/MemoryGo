@@ -1,4 +1,4 @@
-import 'package:MemoryGo/constants.dart';
+import 'package:MemoryGo/values/constants.dart';
 import 'package:MemoryGo/utils/database_helper.dart';
 import 'package:MemoryGo/model/StudySet.dart';
 import 'package:flutter/material.dart';
@@ -14,9 +14,11 @@ class SettingsPage extends StatefulWidget {
   }
 }
 
-class SettingsPageState extends State<SettingsPage> {
+class SettingsPageState extends State<SettingsPage>
+    with SingleTickerProviderStateMixin {
   DatabaseHelper helper = new DatabaseHelper();
   String _selectedDuration = durationList[0];
+  String frequencyStr;
   bool vLowChecked,
       lowChecked,
       medChecked,
@@ -56,14 +58,21 @@ class SettingsPageState extends State<SettingsPage> {
   }
 
   @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    getFrequency();
     return Scaffold(
       appBar: new AppBar(
         title: Text('Settings', style: TextStyle(color: Colors.white)),
         automaticallyImplyLeading: true,
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () => Navigator.pop(context, false),
+          onPressed: () => Navigator.pop(context, true),
         ),
         actions: [
           RaisedButton.icon(
@@ -96,6 +105,12 @@ class SettingsPageState extends State<SettingsPage> {
                     padding: new EdgeInsets.only(right: 10.0),
                     child: new DropdownButton<String>(
                         hint: Text('30 Mins'),
+                        icon: Icon(Icons.arrow_downward),
+                        style: TextStyle(color: Colors.deepPurple),
+                        underline: Container(
+                          height: 2,
+                          color: Colors.deepPurpleAccent,
+                        ),
                         value: _selectedDuration,
                         items: durationList.map((String value) {
                           return new DropdownMenuItem<String>(
@@ -104,6 +119,7 @@ class SettingsPageState extends State<SettingsPage> {
                         onChanged: (newValue) {
                           setState(() {
                             _selectedDuration = newValue;
+                            getFrequency();
                           });
                         }))
               ],
@@ -112,7 +128,7 @@ class SettingsPageState extends State<SettingsPage> {
             buildCardWidget(Column(
               children: [
                 new Padding(
-                    padding: EdgeInsets.only(left: 10.0, top: 10.0),
+                    padding: EdgeInsets.only(top: 10.0),
                     child: Text('Frequency',
                         style: TextStyle(fontWeight: FontWeight.bold))),
                 new Column(
@@ -131,6 +147,7 @@ class SettingsPageState extends State<SettingsPage> {
                               medChecked = !value;
                               highChecked = !value;
                             }
+                            getFrequency();
                           });
                         }),
                     new CheckboxListTile(
@@ -144,6 +161,7 @@ class SettingsPageState extends State<SettingsPage> {
                               medChecked = !value;
                               highChecked = !value;
                             }
+                            getFrequency();
                           });
                         }),
                     new CheckboxListTile(
@@ -157,6 +175,7 @@ class SettingsPageState extends State<SettingsPage> {
                               medChecked = value;
                               highChecked = !value;
                             }
+                            getFrequency();
                           });
                         }),
                     new CheckboxListTile(
@@ -170,9 +189,23 @@ class SettingsPageState extends State<SettingsPage> {
                               medChecked = !value;
                               highChecked = value;
                             }
+                            getFrequency();
                           });
                         }),
                   ],
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(top: 8.0, bottom: 8),
+                  child: Text('Duration between each note: ',
+                      style: TextStyle(fontWeight: FontWeight.bold)),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: AnimatedDefaultTextStyle(
+                      child: Text('$frequencyStr'),
+                      style: TextStyle(
+                          color: Colors.black, fontStyle: FontStyle.italic),
+                      duration: const Duration(milliseconds: 400)),
                 ),
               ],
             )),
@@ -295,7 +328,7 @@ class SettingsPageState extends State<SettingsPage> {
 
     _updateSet(studySet);
 
-    Navigator.pop(context);
+    Navigator.pop(context, true);
   }
 
   void _updateSet(StudySet studySet) async {
@@ -308,5 +341,51 @@ class SettingsPageState extends State<SettingsPage> {
       // Failed to save settings
       print('Failed to save settings');
     }
+  }
+
+  void getFrequency() {
+    setState(() {
+      if (_selectedDuration == '15 Mins') {
+        if (vLowChecked) {
+          frequencyStr = '3 mins'; // 30 mins / 5
+        } else if (lowChecked) {
+          frequencyStr = '1.5 mins'; // 30 mins / 10
+        } else if (medChecked) {
+          frequencyStr = '1 minute'; // 30 mins / 15
+        } else if (highChecked) {
+          frequencyStr = '45 seconds'; // 30 mins / 20
+        }
+      } else if (_selectedDuration == '30 Mins') {
+        if (vLowChecked) {
+          frequencyStr = '6 mins'; // 30 mins / 5
+        } else if (lowChecked) {
+          frequencyStr = '3 mins'; // 30 mins / 10
+        } else if (medChecked) {
+          frequencyStr = '2 mins'; // 30 mins / 15
+        } else if (highChecked) {
+          frequencyStr = '1.5 mins'; // 30 mins / 20
+        }
+      } else if (_selectedDuration == '1 Hr') {
+        if (vLowChecked) {
+          frequencyStr = '12 mins'; // 1 hr / 5
+        } else if (lowChecked) {
+          frequencyStr = '6 mins'; // 1 hr / 10
+        } else if (medChecked) {
+          frequencyStr = '4 mins'; // 1 hr / 15
+        } else if (highChecked) {
+          frequencyStr = '3 mins'; // 1 hr / 20
+        }
+      } else if (_selectedDuration == '2 Hrs') {
+        if (vLowChecked) {
+          frequencyStr = '24 mins'; // 2 hrs / 5
+        } else if (lowChecked) {
+          frequencyStr = '12 mins'; // 2 hrs / 10
+        } else if (medChecked) {
+          frequencyStr = '8 mins'; // 2 hrs / 15
+        } else if (highChecked) {
+          frequencyStr = '6 mins'; // 2 hrs / 20
+        }
+      }
+    });
   }
 }

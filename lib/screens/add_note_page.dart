@@ -1,6 +1,6 @@
 import 'dart:ui';
 
-import 'package:MemoryGo/constants.dart';
+import 'package:MemoryGo/values/constants.dart';
 import 'package:MemoryGo/model/StudySet.dart';
 import 'package:MemoryGo/utils/database_helper.dart';
 import 'package:MemoryGo/model/Note.dart';
@@ -126,7 +126,7 @@ class AddNotePageState extends State<AddNotePage> {
             child: BackdropFilter(
               filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
               child: Container(
-                  height: 90,
+                  height: 100,
                   // color: Theme.of(context).canvasColor.withOpacity(0.3),
                   child: ConstrainedBox(
                     constraints: BoxConstraints(
@@ -156,7 +156,7 @@ class AddNotePageState extends State<AddNotePage> {
                         AnimatedContainer(
                             duration: Duration(milliseconds: 200),
                             width: isChanged ? 100 : 0,
-                            height: 42,
+                            height: 55,
                             curve: Curves.decelerate,
                             child: SingleChildScrollView(
                               scrollDirection: Axis.horizontal,

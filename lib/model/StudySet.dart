@@ -1,13 +1,13 @@
 import 'package:MemoryGo/utils/database_helper.dart';
 
-import '../constants.dart';
+import '../values/constants.dart';
 
 class StudySet {
   static DatabaseHelper databaseHelper = DatabaseHelper();
 
   int _id;
   String _title;
-  String _date;
+  DateTime _date;
   int _numCards;
 
   // Setting
@@ -36,7 +36,9 @@ class StudySet {
 
   String get title => _title;
 
-  String get date => _date;
+  DateTime get date => _date;
+
+  String get formattedDate => getFormattedDate(date.toString());
 
   int get numCards => _numCards;
 
@@ -85,7 +87,7 @@ class StudySet {
       studySetMap['id'] = _id;
     }
     studySetMap['title'] = _title;
-    studySetMap['date'] = _date;
+    studySetMap['date'] = _date.toIso8601String();
     studySetMap['numCards'] = _numCards.toString();
 
     // Settings
@@ -102,7 +104,7 @@ class StudySet {
   StudySet.fromMapObject(Map<String, dynamic> map) {
     this._id = map['id'];
     this._title = map['title'];
-    this._date = map['date'];
+    this._date = DateTime.parse(map['date']);
     this._numCards = int.parse(map['numCards']);
 
     // Settings
@@ -127,12 +129,19 @@ class StudySet {
   }
 
   // Retrieve current date & time and format it
-  String getCurrentDate() {
-    var date = new DateTime.now().toString();
+  DateTime getCurrentDate() {
+    var date = new DateTime.now();
+    // var dateParse = DateTime.parse(date);
+    // var formattedDate =
+    //     "Created: ${dateParse.day.toString().padLeft(2, '0')}-${dateParse.month.toString().padLeft(2, '0')}-${dateParse.year} ${dateParse.hour.toString().padLeft(2, '0')}:${dateParse.minute.toString().padLeft(2, '0')}";
+
+    return date;
+  }
+
+  String getFormattedDate(String date) {
     var dateParse = DateTime.parse(date);
     var formattedDate =
         "Created: ${dateParse.day.toString().padLeft(2, '0')}-${dateParse.month.toString().padLeft(2, '0')}-${dateParse.year} ${dateParse.hour.toString().padLeft(2, '0')}:${dateParse.minute.toString().padLeft(2, '0')}";
-
     return formattedDate;
   }
 

@@ -1,5 +1,5 @@
 name: MemoryGo
-description: A new Flutter project.
+description: A Note-taking app that uses the learn-by-repitition principle in order to study for certain study sets.
 
 # The following line prevents the package from being accidentally published to
 # pub.dev using `pub publish`. This is preferred for private packages.
@@ -24,12 +24,16 @@ dependencies:
   flutter:
     sdk: flutter
 
+  provider: ^4.3.2
   sqflite: any
   path_provider: any
   intl: ^0.15.7
   rxdart: ^0.23.1
   cupertino_icons: ^0.1.3
   flutter_svg: any
+  url_launcher: ^5.6.0
+  flutter_material_color_picker: ^1.0.5
+  shared_preferences: ^0.5.10
   # flutter_local_notifications: ^1.4.2
 
 dev_dependencies:
@@ -41,9 +45,7 @@ flutter_launcher_name:
   name: "MemoryGo"
 #   flutter_launcher_icons:
 
-# flutter_ icons:
-#   image_path: "icon/app_icon.png"
-#   android: true
+
 #   ios: true
 
 # For information on the generic Dart part of this file, see the

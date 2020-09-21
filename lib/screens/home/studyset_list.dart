@@ -1,4 +1,4 @@
-import 'package:MemoryGo/constants.dart';
+import 'package:MemoryGo/values/constants.dart';
 import 'package:MemoryGo/utils/database_helper.dart';
 import 'package:MemoryGo/model/StudySet.dart';
 import 'package:MemoryGo/screens/settings_page.dart';
@@ -33,6 +33,7 @@ class StudySetListState extends State<StudySetList> {
 
   void dispose() {
     nameOfSetController.dispose();
+    searchController.dispose();
     super.dispose();
   }
 
@@ -51,6 +52,7 @@ class StudySetListState extends State<StudySetList> {
           headerSliverBuilder: (context, innerBoxIsScrolled) {
             return <Widget>[
               SliverAppBar(
+                backgroundColor: kPrimaryColor,
                 expandedHeight: 50.0,
                 floating: true,
                 pinned: false,
@@ -72,27 +74,30 @@ class StudySetListState extends State<StudySetList> {
               ),
             ];
           },
-          body: Column(
-            mainAxisSize: MainAxisSize.max,
-            children: [
-              buildHeaderWithSearchBox(size),
-              Container(
-                height: 400,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    // Cards
-                    Expanded(flex: 1, child: getStudySetListView())
-                  ],
+          body: Wrap(children: [
+            Column(
+              mainAxisSize: MainAxisSize.max,
+              children: [
+                buildHeaderWithSearchBox(size),
+                Container(
+                  height: MediaQuery.of(context).size.height * 0.7,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      // Cards
+                      Expanded(flex: 1, child: getStudySetListView())
+                    ],
+                  ),
                 ),
-              ),
-            ],
-          )),
+              ],
+            ),
+          ])),
       floatingActionButton: FloatingActionButton(
         onPressed: () => addStudySetModalBottomSheet(context),
         tooltip: 'Add Study Set',
         child: Icon(Icons.add),
+        backgroundColor: kPrimaryColor,
       ),
     );
   }
@@ -241,7 +246,8 @@ class StudySetListState extends State<StudySetList> {
                           // Date of study set
                           new Padding(
                               padding: EdgeInsets.only(left: 15.0, bottom: 5),
-                              child: Text(filteredStudySets[index].date)),
+                              child:
+                                  Text(filteredStudySets[index].formattedDate)),
                           // Number of cards
                           new Padding(
                               padding: EdgeInsets.only(left: 15, bottom: 5),
@@ -347,6 +353,9 @@ class StudySetListState extends State<StudySetList> {
       });
     } else {
       studySetComponentList = studySets;
+      studySetComponentList.sort((set1, set2) {
+        return set2.date.compareTo(set1.date);
+      });
     }
     setState(() {
       filteredStudySets = studySetComponentList;
@@ -376,6 +385,8 @@ class StudySetListState extends State<StudySetList> {
       print('Problem saving Studyset.');
       // _showAlertDialog('Status', 'Problem saving Studyset.');
     }
+
+    FocusScope.of(context).unfocus(); // Tuck keyboard once added set
 
     // Update list with studyset and return back to the page
     Navigator.pop(context, true);
@@ -417,6 +428,7 @@ class StudySetListState extends State<StudySetList> {
     } else {
       _showSnackbar(context, 'Error deleting Studyset.');
     }
+    FocusScope.of(context).unfocus(); // Tuck keyboard
   }
 
   void _showSnackbar(BuildContext context, String message) {
@@ -424,14 +436,20 @@ class StudySetListState extends State<StudySetList> {
     Scaffold.of(context).showSnackBar(snackBar);
   }
 
-  void openSettingsPage(StudySet studySet) {
-    Navigator.of(context).push(
+  void openSettingsPage(StudySet studySet) async {
+    bool result = await Navigator.of(context).push(
         MaterialPageRoute(builder: (context) => new SettingsPage(studySet)));
+    if (result) {
+      FocusScope.of(context).unfocus(); // Tuck keyboard
+    }
   }
 
-  void openAppSettingsPage() {
-    Navigator.of(context)
+  void openAppSettingsPage() async {
+    bool result = await Navigator.of(context)
         .push(MaterialPageRoute(builder: (context) => new AppSettingsPage()));
+    if (result) {
+      FocusScope.of(context).unfocus(); // Tuck keyboard
+    }
   }
 
   void openNotesPage(StudySet studySet) async {
@@ -453,5 +471,7 @@ class StudySetListState extends State<StudySetList> {
         // print('Failure to update number of cards');
       }
     }
+
+    FocusScope.of(context).unfocus(); // Tuck keyboard
   }
 }

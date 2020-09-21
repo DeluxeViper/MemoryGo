@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:MemoryGo/constants.dart';
+import 'package:MemoryGo/values/constants.dart';
 import 'package:MemoryGo/utils/database_helper.dart';
 import 'package:MemoryGo/model/Note.dart';
 import 'package:MemoryGo/model/StudySet.dart';
@@ -44,47 +44,50 @@ class NotesPageState extends State<NotesPage> {
 
     return new Scaffold(
       appBar: buildAppBar(context),
-      body: new Container(
-          child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            height: 5,
-          ),
-          Padding(
-              padding: EdgeInsets.only(top: 20),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  // Go Button
-                  RaisedButton(
-                    onPressed: () {
-                      if (Platform.isAndroid) {
-                        if (notesList.isEmpty) {
-                          _showSnackBar(context,
-                              "Error, Cannot start. ${studySet.title} is Empty.");
+      body: Builder(
+        builder: (context) => new Container(
+            child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              height: 5,
+            ),
+            Padding(
+                padding: EdgeInsets.only(top: 20),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    // Go Button
+                    RaisedButton(
+                      onPressed: () {
+                        if (Platform.isAndroid) {
+                          if (notesList.isEmpty) {
+                            _showSnackBar(
+                                context, "Error. ${studySet.title} is Empty.");
+                          } else {
+                            openNoteBubble(notesList);
+                          }
                         } else {
-                          openNoteBubble(notesList);
+                          _showSnackBar(context, "Platform unrecognized.");
                         }
-                      } else {
-                        _showSnackBar(context, "Platform unrecognized.");
-                      }
-                    },
-                    color: Colors.green,
-                    textColor: Colors.white,
-                    child: Padding(
-                        padding: EdgeInsets.only(top: 10, bottom: 10),
-                        child: Icon(Icons.play_arrow)),
-                  ),
-                ],
-              )),
-          Expanded(child: getNoteListView())
-        ],
-      )),
+                      },
+                      color: Colors.green,
+                      textColor: Colors.white,
+                      child: Padding(
+                          padding: EdgeInsets.only(top: 10, bottom: 10),
+                          child: Icon(Icons.play_arrow)),
+                    ),
+                  ],
+                )),
+            Expanded(child: getNoteListView())
+          ],
+        )),
+      ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => openAddNotePage(context: context),
         tooltip: 'Add Note',
         child: Icon(Icons.add),
+        backgroundColor: kPrimaryColor,
       ),
     );
   }
