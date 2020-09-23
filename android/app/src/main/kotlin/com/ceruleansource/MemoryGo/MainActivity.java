@@ -1,4 +1,4 @@
-package com.example.MemoryGo;
+package com.ceruleansource.MemoryGo;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
@@ -21,8 +21,8 @@ import androidx.annotation.RequiresApi;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.MemoryGo.adapters.BubbleAdapter;
-import com.example.MemoryGo.model.Note;
+import com.ceruleansource.MemoryGo.adapters.BubbleAdapter;
+import com.ceruleansource.MemoryGo.model.Note;
 import com.google.android.material.button.MaterialButton;
 import com.nex3z.notificationbadge.NotificationBadge;
 import com.txusballesteros.bubbles.BubbleLayout;
