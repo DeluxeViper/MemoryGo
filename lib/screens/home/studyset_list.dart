@@ -51,27 +51,7 @@ class StudySetListState extends State<StudySetList> {
           floatHeaderSlivers: true,
           headerSliverBuilder: (context, innerBoxIsScrolled) {
             return <Widget>[
-              SliverAppBar(
-                backgroundColor: kPrimaryColor,
-                expandedHeight: 50.0,
-                floating: true,
-                pinned: false,
-                title: Text(
-                  'MemoryGo',
-                  style: TextStyle(color: Colors.white),
-                ),
-                flexibleSpace: FlexibleSpaceBar(),
-                actions: [
-                  Padding(
-                    padding: const EdgeInsets.only(right: 10.0),
-                    child: IconButton(
-                        icon: Icon(Icons.settings, color: Colors.white),
-                        onPressed: () {
-                          openAppSettingsPage();
-                        }),
-                  )
-                ],
-              ),
+              buildSliverAppBar(),
             ];
           },
           body: Wrap(children: [
@@ -102,24 +82,27 @@ class StudySetListState extends State<StudySetList> {
     );
   }
 
-  AppBar buildAppBar(BuildContext context) {
-    return AppBar(
-      title: Padding(
-        padding: EdgeInsets.only(left: 0, top: 15),
-        child: Text(
-          "${widget.title}",
-          style: TextStyle(color: Colors.white, fontSize: 25),
-        ),
+  SliverAppBar buildSliverAppBar() {
+    return SliverAppBar(
+      backgroundColor: kPrimaryColor,
+      expandedHeight: 50.0,
+      floating: true,
+      pinned: false,
+      title: Text(
+        'MemoryGo',
+        style: TextStyle(color: Colors.white),
       ),
+      flexibleSpace: FlexibleSpaceBar(),
       actions: [
         Padding(
           padding: const EdgeInsets.only(right: 10.0),
           child: IconButton(
               icon: Icon(Icons.settings, color: Colors.white),
-              onPressed: () => print("Unimplemented.")),
+              onPressed: () {
+                openAppSettingsPage();
+              }),
         )
       ],
-      elevation: 0,
     );
   }
 
@@ -309,7 +292,6 @@ class StudySetListState extends State<StudySetList> {
                               border: OutlineInputBorder(),
                               labelText: 'Study Set Name'),
                           onSubmitted: (value) {
-                            print("submitted");
                             _addSet();
                             nameOfSetController.text = '';
                           })),
@@ -364,7 +346,6 @@ class StudySetListState extends State<StudySetList> {
   }
 
   void _addSet() async {
-    print('Adding set');
     StudySet studySet = new StudySet('', 0);
     int result;
     studySet.title = nameOfSetController.text;
@@ -377,13 +358,11 @@ class StudySetListState extends State<StudySetList> {
 
     if (result != 0) {
       // Success
-      print('Studyset saved Successfully.');
+      // print('Studyset saved Successfully.');
       updateListView();
-      // _showAlertDialog('Status', 'Studyset saved Successfully.');
     } else {
       // Failure
-      print('Problem saving Studyset.');
-      // _showAlertDialog('Status', 'Problem saving Studyset.');
+      // print('Problem saving Studyset.');
     }
 
     FocusScope.of(context).unfocus(); // Tuck keyboard once added set

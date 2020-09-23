@@ -1,7 +1,6 @@
-package com.example.MemoryGo.adapters;
+package com.ceruleansource.MemoryGo.adapters;
 
 import android.graphics.Color;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,8 +9,8 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.MemoryGo.R;
-import com.example.MemoryGo.model.Note;
+import com.ceruleansource.MemoryGo.R;
+import com.ceruleansource.MemoryGo.model.Note;
 
 import java.util.ArrayList;
 

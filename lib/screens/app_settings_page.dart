@@ -219,7 +219,6 @@ class _AppSettingsPageState extends State<AppSettingsPage> {
           selectedColor: kPrimaryColor,
           allowShades: true,
           onColorChange: (Color color) {
-            print(color);
             setState(() {
               kPrimaryColor = color;
             });

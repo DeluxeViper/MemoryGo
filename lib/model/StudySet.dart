@@ -131,9 +131,6 @@ class StudySet {
   // Retrieve current date & time and format it
   DateTime getCurrentDate() {
     var date = new DateTime.now();
-    // var dateParse = DateTime.parse(date);
-    // var formattedDate =
-    //     "Created: ${dateParse.day.toString().padLeft(2, '0')}-${dateParse.month.toString().padLeft(2, '0')}-${dateParse.year} ${dateParse.hour.toString().padLeft(2, '0')}:${dateParse.minute.toString().padLeft(2, '0')}";
 
     return date;
   }

@@ -324,10 +324,10 @@ class SettingsPageState extends State<SettingsPage>
 
     if (result != 0) {
       // Successfully saved settings
-      print('Successfully saved settings');
+      // print('Successfully saved settings');
     } else {
       // Failed to save settings
-      print('Failed to save settings');
+      // print('Failed to save settings');
     }
   }
 

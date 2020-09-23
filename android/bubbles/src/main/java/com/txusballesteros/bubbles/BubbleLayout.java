@@ -204,7 +204,7 @@ public class BubbleLayout extends BubbleBaseLayout {
                 middle = screenWidth / 2;
             }
             float nearestXWall;
-            Log.d(TAG, "goToWall: isleft: " + isLeft);
+//            Log.d(TAG, "goToWall: isleft: " + isLeft);
             nearestXWall = getViewParams().x >= middle ? screenWidth : 0;
             animator.start(nearestXWall, getViewParams().y);
             if (getViewParams().x >= middle) {

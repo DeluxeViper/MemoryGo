@@ -1,7 +1,6 @@
-package com.example.MemoryGo.model;
+package com.ceruleansource.MemoryGo.model;
 
 import android.os.Build;
-import android.util.Log;
 
 import androidx.annotation.RequiresApi;
 
@@ -10,7 +9,6 @@ import org.jetbrains.annotations.NotNull;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Map;
-import java.util.Objects;
 
 public class Note {
     public static final String TAG = "Note";

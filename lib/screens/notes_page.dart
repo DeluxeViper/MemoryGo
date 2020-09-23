@@ -83,11 +83,13 @@ class NotesPageState extends State<NotesPage> {
           ],
         )),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => openAddNotePage(context: context),
-        tooltip: 'Add Note',
-        child: Icon(Icons.add),
-        backgroundColor: kPrimaryColor,
+      floatingActionButton: Builder(
+        builder: (context) => FloatingActionButton(
+          onPressed: () => openAddNotePage(context: context),
+          tooltip: 'Add Note',
+          child: Icon(Icons.add),
+          backgroundColor: kPrimaryColor,
+        ),
       ),
     );
   }
@@ -174,16 +176,16 @@ class NotesPageState extends State<NotesPage> {
                                     EdgeInsets.only(bottom: 10.0, right: 10.0),
                                 child: new Row(
                                   children: [
-                                    new GestureDetector(
-                                        onTap: () {
-                                          openAddNotePage(
-                                              context: context,
-                                              note: notesList[index]);
-                                        },
-                                        child: Icon(
-                                          Icons.edit,
-                                          semanticLabel: 'Edit Note',
-                                        )),
+                                    // new GestureDetector(
+                                    //     onTap: () {
+                                    //       openAddNotePage(
+                                    //           context: context,
+                                    //           note: notesList[index]);
+                                    //     },
+                                    //     child: Icon(
+                                    //       Icons.edit,
+                                    //       semanticLabel: 'Edit Note',
+                                    //     )),
                                     new SizedBox(height: 10.0, width: 10.0),
                                     new GestureDetector(
                                         onTap: () {
@@ -199,6 +201,32 @@ class NotesPageState extends State<NotesPage> {
                     )),
               ));
         });
+  }
+
+  void updateNoteListView() {
+    final Future<Database> dbFuture = helper.initializeDatabase();
+    dbFuture.then((database) {
+      Future<List<Note>> noteListFuture = helper.getNoteList(this.studySet.id);
+      noteListFuture.then((noteList) {
+        setState(() {
+          this.notesList = noteList;
+          this.notesListCount = noteList.length;
+          this.studySet.numCards = notesList.length;
+        });
+
+        // Update study set
+        Future<int> result = helper.updateStudySet(this.studySet);
+        result.then((value) {
+          if (value != 0) {
+            // print("successfully updated study set number of cards.");
+          } else {
+            _showSnackBar(
+                context, 'Failed to update number of cards for Study Set.');
+            // print("failed ot update study set number of cards.");
+          }
+        });
+      });
+    });
   }
 
   void openNoteBubble(List<Note> notesList) async {
@@ -219,10 +247,10 @@ class NotesPageState extends State<NotesPage> {
         "shuffle": studySet.shuffle.toString()
       }).whenComplete(() {
         isSessionEnded = true;
-        print("Note bubble completed.");
+        // print("Note bubble completed.");
       });
     } catch (e) {
-      print(e);
+      // print(e);
     }
   }
 
@@ -232,12 +260,6 @@ class NotesPageState extends State<NotesPage> {
       // Success
       _showSnackBar(context, 'Note deleted Successfully');
       studySet.numCards--;
-      // int updateSetResult = await helper.updateStudySet(this.studySet);
-      // if (updateSetResult != 0) {
-      //   print("successfully updated study set number of cards.");
-      // } else {
-      //   print("failed ot update study set number of cards.");
-      // }
       updateNoteListView();
     } else {
       // Failure
@@ -248,30 +270,6 @@ class NotesPageState extends State<NotesPage> {
   void _showSnackBar(BuildContext context, String message) {
     final SnackBar snackBar = SnackBar(content: Text(message));
     Scaffold.of(context).showSnackBar(snackBar);
-  }
-
-  void updateNoteListView() {
-    final Future<Database> dbFuture = helper.initializeDatabase();
-    dbFuture.then((database) {
-      Future<List<Note>> noteListFuture = helper.getNoteList(this.studySet.id);
-      noteListFuture.then((noteList) {
-        setState(() {
-          this.notesList = noteList;
-          this.notesListCount = noteList.length;
-          this.studySet.numCards = notesList.length;
-        });
-
-        // Update study set
-        Future<int> result = helper.updateStudySet(this.studySet);
-        result.then((value) {
-          if (value != 0) {
-            print("successfully updated study set number of cards.");
-          } else {
-            print("failed ot update study set number of cards.");
-          }
-        });
-      });
-    });
   }
 
   void openAddNotePage({@required BuildContext context, Note note}) async {

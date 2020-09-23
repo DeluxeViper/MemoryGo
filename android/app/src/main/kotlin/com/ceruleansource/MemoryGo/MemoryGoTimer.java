@@ -1,4 +1,4 @@
-package com.example.MemoryGo;
+package com.ceruleansource.MemoryGo;
 
 import java.util.Timer;
 

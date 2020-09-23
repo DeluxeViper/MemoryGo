@@ -87,7 +87,6 @@ class AddNotePageState extends State<AddNotePage> {
                       ),
                       onSubmitted: (value) {
                         noteBodyFocusNode.requestFocus();
-                        print("title submitted");
                       },
                     )),
                 // Note Body
@@ -119,7 +118,6 @@ class AddNotePageState extends State<AddNotePage> {
                       ),
                       onSubmitted: (value) {
                         _addNote();
-                        print("submitted");
                       },
                     )),
               ],
@@ -221,7 +219,6 @@ class AddNotePageState extends State<AddNotePage> {
     }
 
     int result;
-    print('Note: $note');
 
     if (note.id != null) {
       // Case 1: Update Operation
@@ -233,10 +230,10 @@ class AddNotePageState extends State<AddNotePage> {
 
     if (result != 0) {
       // Success
-      print('Successfully added/updated Note.');
+      // print('Successfully added/updated Note.');
     } else {
       // Failure
-      print('Failed to add/update Note.');
+      // print('Failed to add/update Note.');
     }
 
     Navigator.pop(context, true);
