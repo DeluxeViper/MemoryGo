@@ -201,7 +201,7 @@ public class MainActivity extends FlutterActivity {
                     previousNoteIndex = currentNoteIndex;
                     shuffleReadList.add(notesList.get(currentNoteIndex));
                     if (shuffleReadList.containsAll(notesList)) {
-                        Log.d(TAG, "handleMessage: stopping session because all of the notes are read.");
+//                        Log.d(TAG, "handleMessage: stopping session because all of the notes are read.");
                         stopSession();
                         return;
                     }
@@ -213,11 +213,11 @@ public class MainActivity extends FlutterActivity {
                 if (!unreadNotesList.contains(notesList.get(currentNoteIndex))) {
                     unreadNotesList.add(notesList.get(currentNoteIndex));
                 }
-                Log.d(TAG, "handleMessage: unreadNotesList : " + unreadNotesList);
+//                Log.d(TAG, "handleMessage: unreadNotesList : " + unreadNotesList);
 
                 badge.setNumber(unreadNotesList.size());
                 if (currentNoteIndex == notesList.size() - 1 && !repeat && !shuffle) {
-                    Log.d(TAG, "handleMessage: stopping session because last note is read and repeat is off. (overwrite is on)");
+//                    Log.d(TAG, "handleMessage: stopping session because last note is read and repeat is off. (overwrite is on)");
                     stopSession();
                 }
             } else {
@@ -232,7 +232,7 @@ public class MainActivity extends FlutterActivity {
                 ArrayList<Note> currentNote = new ArrayList<>();
                 currentNote.add(notesList.get(currentNoteIndex));
                 if (currentNoteIndex == notesList.size() - 1 && !repeat && !shuffle) {
-                    Log.d(TAG, "handleMessage: stopping session because last note is read and repeat is off. (overwrite is off)");
+//                    Log.d(TAG, "handleMessage: stopping session because last note is read and repeat is off. (overwrite is off)");
                     stopSession();
                 }
                 mAdapter.setNotes(currentNote);
@@ -265,7 +265,7 @@ public class MainActivity extends FlutterActivity {
     protected void startTimer() {
         rand = new Random();
         shuffleReadList.clear();
-        Log.d(TAG, "startTimer: starting timer");
+//        Log.d(TAG, "startTimer: starting timer");
         addNewBubble();
         timer = new MemoryGoTimer(false);
         timer.start();
@@ -281,7 +281,7 @@ public class MainActivity extends FlutterActivity {
                 // If repeat is off
                 if (!repeat) {
                     if (currentNoteIndex >= notesList.size() || timer.getElapsedTime() >= duration) {
-                        Log.d(TAG, "run: stopping session because last note has been reached OR duration has been met. (repeat is off)");
+//                        Log.d(TAG, "run: stopping session because last note has been reached OR duration has been met. (repeat is off)");
                         stopSession();
                     } else {
                         timerHandler.obtainMessage().sendToTarget();
@@ -289,7 +289,7 @@ public class MainActivity extends FlutterActivity {
                 } else {
                     // Repeat is on
                     if (timer.getElapsedTime() >= duration) {
-                        Log.d(TAG, "run: stopping session because duration has been met. (repeat is on)");
+//                        Log.d(TAG, "run: stopping session because duration has been met. (repeat is on)");
                         stopSession();
                     } else {
                         timerHandler.obtainMessage().sendToTarget();
@@ -313,7 +313,7 @@ public class MainActivity extends FlutterActivity {
                 }
                 sessionEnded = true;
                 timer.cancel();
-                Log.d(TAG, "run: Posted Success.");
+//                Log.d(TAG, "run: Posted Success.");
                 stopButton.setVisibility(View.GONE);
                 methodResult.success("Session Success");
             }
@@ -485,7 +485,7 @@ public class MainActivity extends FlutterActivity {
 
     @Override
     protected void onDestroy() {
-        bubblesManager.recycle();
         super.onDestroy();
+        bubblesManager.recycle();
     }
 }
