@@ -33,8 +33,8 @@ class MemoryGoApp extends StatelessWidget {
       title: 'MemoryGo',
       debugShowCheckedModeBanner: false,
       theme: themeNotifier.getTheme(),
-      initialRoute: '/onboard',
-      // initScreen == 0 || initScreen == null ? 'onboard' : 'homepage',
+      initialRoute:
+          initScreen == 0 || initScreen == null ? '/onboard' : '/homepage',
       routes: {
         '/homepage': (context) => StudySetList(
               title: 'MemoryGo',
