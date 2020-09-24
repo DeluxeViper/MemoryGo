@@ -14,3 +14,15 @@ var appTheme = ThemeData(
   primaryColor: kPrimaryColor,
   visualDensity: VisualDensity.adaptivePlatformDensity,
 );
+
+double getProportionateScreenWidth(BuildContext context, double inputWidth) {
+  double screenWidth = MediaQuery.of(context).size.width;
+
+  return (inputWidth / 375.0) * screenWidth;
+}
+
+double getProportionateScreenHeight(BuildContext context, double inputWidth) {
+  double screenHeight = MediaQuery.of(context).size.height;
+
+  return (inputWidth / 812.0) * screenHeight;
+}

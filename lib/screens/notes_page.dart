@@ -258,7 +258,7 @@ class NotesPageState extends State<NotesPage> {
     int result = await helper.deleteNote(note.id);
     if (result != 0) {
       // Success
-      _showSnackBar(context, 'Note deleted Successfully');
+      // _showSnackBar(context, 'Note deleted Successfully');
       studySet.numCards--;
       updateNoteListView();
     } else {
@@ -289,9 +289,9 @@ class NotesPageState extends State<NotesPage> {
       // Successfully added/updated Note
       updateNoteListView();
       if (note == null) {
-        _showSnackBar(context, 'Successfully added Note');
+        // _showSnackBar(context, 'Successfully added Note');
       } else {
-        _showSnackBar(context, 'Successfully updated Note');
+        // _showSnackBar(context, 'Successfully updated Note');
       }
     } else {
       // Failure to add/update Note
