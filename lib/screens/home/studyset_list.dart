@@ -74,7 +74,7 @@ class StudySetListState extends State<StudySetList> {
             ),
           ])),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => addStudySetModalBottomSheet(context),
+        onPressed: () => addStudySetModalBottomSheet(context: context),
         tooltip: 'Add Study Set',
         child: Icon(Icons.add),
         backgroundColor: kPrimaryColor,
@@ -84,6 +84,7 @@ class StudySetListState extends State<StudySetList> {
 
   SliverAppBar buildSliverAppBar() {
     return SliverAppBar(
+      automaticallyImplyLeading: false,
       backgroundColor: kPrimaryColor,
       expandedHeight: 50.0,
       floating: true,
@@ -197,76 +198,92 @@ class StudySetListState extends State<StudySetList> {
           return Container(
               width: double.infinity,
               margin: EdgeInsets.all(15.0),
-              child: Card(
-                  elevation: 5,
-                  child: InkWell(
-                      splashColor: Colors.blue.withAlpha(20),
-                      onTap: () {
-                        openNotesPage(filteredStudySets[index]);
-                      },
-                      // Study set
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          Padding(
-                            padding: const EdgeInsets.all(10.0),
-                            child: Row(
-                              children: [
-                                Image(
-                                  height: 40,
-                                  width: 40,
-                                  image: AssetImage(
-                                      'assets/icons/notebook_icon.png'),
-                                ),
-                                new Padding(
-                                    padding: const EdgeInsets.all(10.0),
-                                    child: Text(filteredStudySets[index].title,
-                                        style: TextStyle(fontSize: 20))),
-                              ],
-                            ),
-                          ),
-                          // Date of study set
-                          new Padding(
-                              padding: EdgeInsets.only(left: 15.0, bottom: 5),
-                              child:
-                                  Text(filteredStudySets[index].formattedDate)),
-                          // Number of cards
-                          new Padding(
-                              padding: EdgeInsets.only(left: 15, bottom: 5),
-                              child: Text(filteredStudySets[index]
-                                  .numCards
-                                  .toString())),
-                          // Delete and settings page icons
-                          new Padding(
-                              padding: EdgeInsets.all(15.0),
-                              child: new Row(
-                                crossAxisAlignment: CrossAxisAlignment.end,
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                children: [
-                                  new GestureDetector(
-                                      onTap: () =>
-                                          openSettingsPage(studySets[index]),
-                                      child: Icon(
-                                        Icons.settings,
-                                        semanticLabel: 'Study set settings',
-                                      )),
-                                  new SizedBox(height: 10.0, width: 10.0),
-                                  new GestureDetector(
-                                      onTap: () {
-                                        showDeleteSetDialog(context, index);
-                                      },
-                                      child: Icon(Icons.delete,
-                                          semanticLabel: 'Delete Study set'))
-                                ],
-                              ))
-                        ],
-                      ))));
+              child: buildStudySetCard(index, context));
         });
   }
 
-  void addStudySetModalBottomSheet(BuildContext context) {
-    nameOfSetController.text = '';
+  Card buildStudySetCard(int index, BuildContext context) {
+    return Card(
+        elevation: 5,
+        child: InkWell(
+            splashColor: Colors.blue.withAlpha(20),
+            onTap: () {
+              openNotesPage(filteredStudySets[index]);
+            },
+            // Study set
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Padding(
+                  padding: const EdgeInsets.all(10.0),
+                  child: Row(
+                    children: [
+                      Image(
+                        height: 40,
+                        width: 40,
+                        image: AssetImage('assets/icons/notebook_icon.png'),
+                      ),
+                      new Padding(
+                          padding: const EdgeInsets.all(10.0),
+                          child: Text(filteredStudySets[index].title,
+                              style: TextStyle(fontSize: 20))),
+                    ],
+                  ),
+                ),
+                // Date of study set
+                new Padding(
+                    padding: EdgeInsets.only(left: 15.0, bottom: 5),
+                    child: Text(
+                      filteredStudySets[index].formattedDate,
+                      style: TextStyle(fontWeight: FontWeight.w300),
+                    )),
+                // Number of cards
+                new Padding(
+                    padding: EdgeInsets.only(left: 15, bottom: 5),
+                    child: Text(filteredStudySets[index].numCards.toString())),
+                // Delete and settings page icons
+                new Padding(
+                    padding: EdgeInsets.all(15.0),
+                    child: new Row(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        new GestureDetector(
+                            onTap: () => addStudySetModalBottomSheet(
+                                  context: context,
+                                  studySet: studySets[index],
+                                ),
+                            child: Icon(
+                              Icons.edit,
+                              semanticLabel: 'Edit Study Set',
+                            )),
+                        new SizedBox(height: 10.0, width: 10.0),
+                        new GestureDetector(
+                            onTap: () => openSettingsPage(studySets[index]),
+                            child: Icon(
+                              Icons.settings,
+                              semanticLabel: 'Study set settings',
+                            )),
+                        new SizedBox(height: 10.0, width: 10.0),
+                        new GestureDetector(
+                            onTap: () {
+                              showDeleteSetDialog(context, index);
+                            },
+                            child: Icon(Icons.delete,
+                                semanticLabel: 'Delete Study set'))
+                      ],
+                    ))
+              ],
+            )));
+  }
+
+  void addStudySetModalBottomSheet({BuildContext context, StudySet studySet}) {
+    if (studySet != null) {
+      nameOfSetController.text = studySet.title;
+    } else {
+      nameOfSetController.text = '';
+    }
     showModalBottomSheet(
         enableDrag: true,
         isScrollControlled: true,
@@ -292,16 +309,26 @@ class StudySetListState extends State<StudySetList> {
                               border: OutlineInputBorder(),
                               labelText: 'Study Set Name'),
                           onSubmitted: (value) {
-                            _addSet();
+                            if (studySet != null) {
+                              _updateSet(studySet);
+                            } else {
+                              _addSet();
+                            }
                             nameOfSetController.text = '';
                           })),
                   new RaisedButton(
                     onPressed: () {
-                      _addSet();
+                      if (studySet != null) {
+                        _updateSet(studySet);
+                      } else {
+                        _addSet();
+                      }
                       nameOfSetController.text = '';
                     },
                     color: kPrimaryColor,
-                    child: Text("Add Study Set"),
+                    child: (studySet == null
+                        ? Text('Add Study Set')
+                        : Text('Update Study Set')),
                   ),
                 ],
               ));
@@ -345,16 +372,34 @@ class StudySetListState extends State<StudySetList> {
     });
   }
 
+  void _updateSet(StudySet studySet) async {
+    int result;
+    studySet.title = nameOfSetController.text;
+
+    if (studySet.id != null) {
+      result = await databaseHelper.updateStudySet(studySet);
+    } else {
+      // Attempting to update an imaginary study set
+      throw Exception('Attempting to update a non-existing Study Set');
+    }
+
+    if (result != 0) {
+      // Success
+      updateListView();
+    } else {
+      _showSnackbar(context, 'Failed to update study set');
+    }
+
+    FocusScope.of(context).unfocus(); // Tuck keyboard once added set
+    Navigator.pop(context, true);
+  }
+
   void _addSet() async {
     StudySet studySet = new StudySet('', 0);
     int result;
     studySet.title = nameOfSetController.text;
-    if (studySet.id != null) {
-      // Case 1: Update Operation -> Studyset exists
-      result = await databaseHelper.updateStudySet(studySet);
-    } else {
-      result = await databaseHelper.insertStudySet(studySet);
-    }
+
+    result = await databaseHelper.insertStudySet(studySet);
 
     if (result != 0) {
       // Success
