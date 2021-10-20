@@ -41,7 +41,7 @@ A Mobile Application (iOS and Android) created using the Flutter framework, Deve
  This mobile application was built using Flutter, a cross-platform framework that allows you to develop applications for both iOS and Android devices with 1 application. The Flutter application had the ability to create, edit, and delete study sets and cards that user could then use to study from at a later point. This Flutter application was specialized for Android using Method Channels, so that the user could multitask while studying! The specialized Android code made it so that the user could pick a study set, adjust the settings so that the recurrence, duration, repetition, among other options were available to customize their learning experience. Then, when the user went to press start, a background service would start on the Android device and the user would be able to roam through their apps or turn their phone off. After every specified interval of time, the user would receive a notification and a bubble would pop up on their screen, which would then display the certain notes within their study set.
  
 
-# General Description of App
+# General Description of the Application
 
 Ever struggled to study for a test where you just can't remember anything you studied? A vocabulary word, a definition, a Biology term, a Physics definition that you just can’t remember?
 
