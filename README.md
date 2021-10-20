@@ -63,5 +63,5 @@ If you enjoy the app, please recommend our platform to family and friends, and r
 Library Credits -
 
 Quick thanks to the following libraries for making this app possible:
-Notification Badges -> nex3z
+Notification Badges -> nex3z,
 Chat bubble -> txusballesteros
