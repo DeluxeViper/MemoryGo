@@ -8,6 +8,13 @@ A Mobile Application (iOS and Android) created using the Flutter framework, Deve
  * Utilized Java to create multithreaded asynchronous tasks for seamless multitasking
  * Leveraged SQLite database for offline, local usage (no internet required!)
 
+<table>
+ <tr>
+  <td valign="top"><img src="/7-1.png"></td>
+  <td valign="top"><img src="/7-2.png"></td>
+ </tr>
+</table>
+
 # Give it a Go! https://play.google.com/store/apps/details?id=com.ceruleansource.MemoryGo
 
 # Here's a Demo Video about it - https://www.youtube.com/watch?v=ipWID-tdo-I
