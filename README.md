@@ -59,7 +59,7 @@ MemoryGo uses a PROVEN study method called “Rote Learning” (Learning by repe
 The app is still at early stages of development and will be monitored/updated for advancement purposes. We would love to hear feedback, ideas and constructive criticism from you so we could improve your overall experience.
 
 
-*Library Credits:
+*Library Credits:*
 
 Quick thanks to the following libraries for making this app possible:
 Notification Badges -> nex3z,
