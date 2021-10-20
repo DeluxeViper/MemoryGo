@@ -10,20 +10,58 @@ A Mobile Application (iOS and Android) created using the Flutter framework, Deve
 
 <table>
  <tr>
-  <td valign="top"><img src="/7-1.png"></td>
-  <td valign="top"><img src="/7-2.png"></td>
+  <td valign="top"><img src="7-1.jpg"></td>
+  <td valign="top"><img src="7-2.jpg"></td>
+  <td valign="top"><img src="7-3.jpg"></td>
+  <td valign="top"><img src="7-4.jpg"></td>
+  <td valign="top"><img src="7-5.jpg"></td>
  </tr>
 </table>
 
-# Give it a Go! https://play.google.com/store/apps/details?id=com.ceruleansource.MemoryGo
+### Try it yourself! https://play.google.com/store/apps/details?id=com.ceruleansource.MemoryGo
 
-# Here's a Demo Video about it - https://www.youtube.com/watch?v=ipWID-tdo-I
-# Here's a Promotional Video - https://www.youtube.com/watch?v=9aQ1SX-1k_o
-# Check out our LinkedIn page - https://www.linkedin.com/company/memorygo
+### Here's a Demo Video: https://www.youtube.com/watch?v=ipWID-tdo-I
+### Here's a Promotional Video - https://www.youtube.com/watch?v=9aQ1SX-1k_o
+### Check out our LinkedIn page - https://www.linkedin.com/company/memorygo
 
-# How it works
+# Technical Design
 
+### Built With
 
-# How I made it
+ * Dart
+ * Flutter
+ * Java (Android)
+ * XML
+ * SQL (SQLite)
+ * Gradle
+ * Android Studio
 
- - 
+### Techincal Description
+
+ This mobile application was built using Flutter, a cross-platform framework that allows you to develop applications for both iOS and Android devices with 1 application. The Flutter application had the ability to create, edit, and delete study sets and cards that user could then use to study from at a later point. This Flutter application was specialized for Android using Method Channels, so that the user could multitask while studying! The specialized Android code made it so that the user could pick a study set, adjust the settings so that the recurrence, duration, repitition, among more options were available to customize their learning experience. Then, when the user went to press start, the background service would start on Android and the user would be able to roam through their apps or turn their phone off. After every specified interval of time, the user would receive a notification and a bubble would pop up on their screen, which would then display the certain notes within their study set.
+ 
+
+### Description of App
+
+Ever struggled to study for a test where you just can't remember anything you studied? A vocabulary word, a definition, a Biology term, a Physics definition that you just can’t remember?
+
+Or how about being too BUSY to study? (we get it, you have a social life too!)
+
+MemoryGo is a flashcard tool that lets you study without realization while you play games, surf the internet, watch a video, chat with friends or any other task. Using our innovative popup/notification system specifically designed for multitasking, all you need to do is create a study set for a test, press play, and let MemoryGo work its magic!
+
+MemoryGo uses a PROVEN study method called “Rote Learning” (Learning by repetition).
+
+**MemoryGo allows users to:**
+* Create, edit, and delete study sets and cards
+* Set Theme colours
+* Control the recurrence, duration, repeat and overwrite for a customized learning experience
+
+The app is still at early stages of development and will be monitored/updated for advancement purposes. We would love to hear feedback, ideas and constructive criticism from you so we could improve your overall experience.
+
+If you enjoy the app, please recommend our platform to family and friends, and rate our MemoryGo on the PlayStore!
+
+Library Credits -
+
+Quick thanks to the following libraries for making this app possible:
+Notification Badges -> nex3z
+Chat bubble -> txusballesteros
