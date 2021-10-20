@@ -18,11 +18,11 @@ A Mobile Application (iOS and Android) created using the Flutter framework, Deve
  </tr>
 </table>
 
-### Try it yourself! https://play.google.com/store/apps/details?id=com.ceruleansource.MemoryGo
+### Try it out yourself! https://play.google.com/store/apps/details?id=com.ceruleansource.MemoryGo
 
-### Here's a Demo Video: https://www.youtube.com/watch?v=ipWID-tdo-I
-### Here's a Promotional Video - https://www.youtube.com/watch?v=9aQ1SX-1k_o
-### Check out our LinkedIn page - https://www.linkedin.com/company/memorygo
+###### Here's a Demo Video: https://www.youtube.com/watch?v=ipWID-tdo-I
+###### Here's a Promotional Video: https://www.youtube.com/watch?v=9aQ1SX-1k_o
+###### Check out our LinkedIn page: https://www.linkedin.com/company/memorygo
 
 # Technical Design
 
