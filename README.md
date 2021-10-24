@@ -1,5 +1,5 @@
 # MemoryGo
-A Mobile Application (iOS and Android) created using the Flutter framework, Developed by Abdullah Mohamed. Credits to Hudson Pu for the idea!
+A Mobile Application (iOS and Android) created using the Flutter framework.
 ![](featuregraphic.png)
 
 # TLDR 
