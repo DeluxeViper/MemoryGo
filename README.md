@@ -8,6 +8,7 @@ A Mobile Application (iOS and Android) created using the Flutter framework.
  * This app was created using the Flutter framework using Dart, and specialized using Android (Java) code for the Android app on the Google Playstore (linked below)
  * Utilized Java to create multithreaded asynchronous tasks for seamless multitasking
  * Leveraged SQLite database for offline, local usage (no internet required!)
+ * Credits to my cofounder Hudson Pu for coming up with the idea!
 
 <table>
  <tr>
