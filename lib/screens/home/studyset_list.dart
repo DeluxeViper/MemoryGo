@@ -46,7 +46,7 @@ class StudySetListState extends State<StudySetList> {
     }
 
     return Scaffold(
-      resizeToAvoidBottomPadding: false,
+      resizeToAvoidBottomInset: false,
       body: NestedScrollView(
           floatHeaderSlivers: true,
           headerSliverBuilder: (context, innerBoxIsScrolled) {
@@ -316,7 +316,7 @@ class StudySetListState extends State<StudySetList> {
                             }
                             nameOfSetController.text = '';
                           })),
-                  new RaisedButton(
+                  new ElevatedButton(
                     onPressed: () {
                       if (studySet != null) {
                         _updateSet(studySet);
@@ -325,7 +325,11 @@ class StudySetListState extends State<StudySetList> {
                       }
                       nameOfSetController.text = '';
                     },
-                    color: kPrimaryColor,
+                    style: ElevatedButton.styleFrom(
+                      foregroundColor: Colors.white,
+                      backgroundColor: kPrimaryColor,
+                    ),
+                    // color: kPrimaryColor,
                     child: (studySet == null
                         ? Text('Add Study Set')
                         : Text('Update Study Set')),
@@ -421,11 +425,11 @@ class StudySetListState extends State<StudySetList> {
       title: Text("Delete Study Set"),
       content: Text("Are you sure you want to delete this study set?"),
       actions: [
-        FlatButton(
+        TextButton(
           child: Text('CANCEL'),
           onPressed: Navigator.of(context).pop,
         ),
-        FlatButton(
+        TextButton(
             child: Text('SUBMIT'),
             onPressed: () {
               _delete(context, studySets[index]);
@@ -456,7 +460,7 @@ class StudySetListState extends State<StudySetList> {
 
   void _showSnackbar(BuildContext context, String message) {
     final snackBar = SnackBar(content: Text(message));
-    Scaffold.of(context).showSnackBar(snackBar);
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
   void openSettingsPage(StudySet studySet) async {

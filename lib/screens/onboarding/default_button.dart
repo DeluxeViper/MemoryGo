@@ -17,8 +17,9 @@ class DefaultButton extends StatelessWidget {
       child: SizedBox(
         width: double.infinity,
         height: getProportionateScreenHeight(context, 56),
-        child: FlatButton(
-          color: kPrimaryColor,
+        child: TextButton(
+          style: TextButton.styleFrom(foregroundColor: kPrimaryColor),
+          // color: kPrimaryColor,
           onPressed: () => press(),
           child: Text(
             text,

@@ -41,7 +41,6 @@ class MemoryGoApp extends StatelessWidget {
             ),
         '/onboard': (context) => OnBoardingScreen(),
       },
-      // home: StudySetList(title: 'MemoryGo'),
     );
   }
 }

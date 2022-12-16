@@ -68,9 +68,9 @@ class SettingsPageState extends State<SettingsPage>
           onPressed: () => Navigator.pop(context, true),
         ),
         actions: [
-          RaisedButton(
+          ElevatedButton(
             child: Text('Save', style: TextStyle(color: Colors.white)),
-            color: kPrimaryColor,
+            // color: kPrimaryColor,
             onPressed: () => onSaved(),
           )
         ],
@@ -257,13 +257,14 @@ class SettingsPageState extends State<SettingsPage>
               child: new Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    RaisedButton(
-                      elevation: 5,
-                      padding: EdgeInsets.only(
-                          top: 10.0, bottom: 10.0, left: 50, right: 50),
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        padding: EdgeInsets.only(
+                            top: 10.0, bottom: 10.0, left: 50, right: 50),
+                      ),
                       child: Text('Save'),
-                      textColor: Colors.white,
-                      color: Colors.purple,
+                      // textColor: Colors.white,
+                      // color: Colors.purple,
                       onPressed: () => onSaved(),
                     )
                   ]),

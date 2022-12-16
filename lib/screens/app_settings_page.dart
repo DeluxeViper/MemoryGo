@@ -51,9 +51,9 @@ class _AppSettingsPageState extends State<AppSettingsPage> {
                           ),
                           TextSpan(
                               recognizer: new TapGestureRecognizer()
-                                ..onTap = () => launchUrl(
-                                    'https://github.com/CeruleanSource'),
-                              text: 'CeruleanSource',
+                                ..onTap = () =>
+                                    launchUrl('https://github.com/DeluxeViper'),
+                              text: 'DeluxeViper',
                               style: TextStyle(
                                   fontSize: 17,
                                   fontWeight: FontWeight.bold,
@@ -239,11 +239,11 @@ class _AppSettingsPageState extends State<AppSettingsPage> {
           title: Text(title),
           content: content,
           actions: [
-            FlatButton(
+            ElevatedButton(
               child: Text('CANCEL'),
               onPressed: Navigator.of(context).pop,
             ),
-            FlatButton(
+            ElevatedButton(
               child: Text('SUBMIT'),
               onPressed: () {
                 Navigator.of(context).pop();

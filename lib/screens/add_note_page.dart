@@ -161,13 +161,16 @@ class AddNotePageState extends State<AddNotePage> {
                               curve: Curves.decelerate,
                               child: SingleChildScrollView(
                                 scrollDirection: Axis.horizontal,
-                                child: RaisedButton.icon(
-                                  color: Theme.of(context).accentColor,
-                                  textColor: Colors.white,
-                                  shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.only(
-                                          topLeft: Radius.circular(100),
-                                          bottomLeft: Radius.circular(100))),
+                                child: ElevatedButton.icon(
+                                  style: ElevatedButton.styleFrom(
+                                    foregroundColor:
+                                        Theme.of(context).accentColor,
+                                    backgroundColor: Colors.white,
+                                    shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.only(
+                                            topLeft: Radius.circular(100),
+                                            bottomLeft: Radius.circular(100))),
+                                  ),
                                   icon: Icon(Icons.done),
                                   label: Text(
                                     'SAVE',

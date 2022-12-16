@@ -58,7 +58,7 @@ class NotesPageState extends State<NotesPage> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     // Go Button
-                    RaisedButton(
+                    ElevatedButton(
                       onPressed: () {
                         if (Platform.isAndroid) {
                           if (notesList.isEmpty) {
@@ -71,8 +71,11 @@ class NotesPageState extends State<NotesPage> {
                           _showSnackBar(context, "Platform unrecognized.");
                         }
                       },
-                      color: Colors.green,
-                      textColor: Colors.white,
+                      style: ElevatedButton.styleFrom(
+                          foregroundColor: Colors.green,
+                          backgroundColor: Colors.white),
+                      // color: Colors.green,
+                      // textColor: Colors.white,
                       child: Padding(
                           padding: EdgeInsets.only(top: 10, bottom: 10),
                           child: Icon(Icons.play_arrow)),
@@ -269,7 +272,7 @@ class NotesPageState extends State<NotesPage> {
 
   void _showSnackBar(BuildContext context, String message) {
     final SnackBar snackBar = SnackBar(content: Text(message));
-    Scaffold.of(context).showSnackBar(snackBar);
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
   void openAddNotePage({@required BuildContext context, Note note}) async {
