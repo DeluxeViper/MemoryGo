@@ -85,3 +85,10 @@ A Mobile Application created using the Flutter framework, Developed by Abdullah 
 IOS - Run `open -a simulator`
 
 Android - Use `Ctrl+p` to go into settings within VSCode
+
+### Rebuild
+
+If running into a series of errors, try rebuilding the flutter app by:
+
+1. Run `flutter clean`
+2. Run `flutter pub get`
